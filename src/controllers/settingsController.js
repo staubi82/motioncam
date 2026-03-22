@@ -3,6 +3,8 @@ const settingsService = require('../services/settingsService');
 const authService = require('../services/authService');
 const mailService = require('../services/mailService');
 const motionService = require('../services/motionService');
+const ffmpegService = require('../services/ffmpegService');
+const recordingService = require('../services/recordingService');
 
 const EDITABLE_KEYS = [
   'detection_enabled', 'detection_sensitivity', 'detection_min_area', 'event_cooldown_seconds',
@@ -11,6 +13,8 @@ const EDITABLE_KEYS = [
   'snapshot_path', 'camera_device', 'audio_device',
   'mail_enabled', 'mail_cooldown_seconds', 'mail_snapshot_attach',
   'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_tls', 'smtp_from', 'mail_recipient',
+  'overlay_enabled', 'overlay_show_datetime', 'overlay_show_resolution',
+  'overlay_show_location', 'overlay_location_name', 'overlay_position',
 ];
 
 function showSettings(req, res) {
@@ -28,7 +32,7 @@ function saveSettings(req, res, next) {
     for (const key of EDITABLE_KEYS) {
       if (key in req.body) update[key] = req.body[key];
       // Checkboxes: if not in body, they are false
-      else if (['detection_enabled', 'recording_enabled', 'audio_enabled', 'mail_enabled', 'smtp_tls', 'mail_snapshot_attach'].includes(key)) {
+      else if (['detection_enabled', 'recording_enabled', 'audio_enabled', 'mail_enabled', 'smtp_tls', 'mail_snapshot_attach', 'overlay_enabled', 'overlay_show_datetime', 'overlay_show_resolution', 'overlay_show_location'].includes(key)) {
         update[key] = 'false';
       }
     }
@@ -70,4 +74,37 @@ async function changePassword(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { showSettings, saveSettings, testMail, changePassword };
+async function testMotion(req, res) {
+  try {
+    if (ffmpegService.isRecording()) {
+      return res.status(409).json({ ok: false, message: 'Aufnahme läuft bereits' });
+    }
+    if (!settingsService.getBool('recording_enabled')) {
+      return res.status(409).json({ ok: false, message: 'Aufnahme ist deaktiviert' });
+    }
+
+    await recordingService.startRecording(true);
+    recordingService.scheduleStop();
+
+    const sendMail = req.body.sendMail === true || req.body.sendMail === 'true';
+    if (sendMail) {
+      const smtpHost = settingsService.get('smtp_host');
+      const smtpFrom = settingsService.get('smtp_from');
+      const mailRecipient = settingsService.get('mail_recipient');
+      if (!smtpHost || !smtpFrom || !mailRecipient) {
+        return res.json({ ok: true, message: 'Testaufnahme gestartet', mailError: 'SMTP nicht vollständig konfiguriert' });
+      }
+      try {
+        await mailService.sendTestMail();
+      } catch (err) {
+        return res.json({ ok: true, message: 'Testaufnahme gestartet', mailError: err.message });
+      }
+    }
+
+    res.json({ ok: true, message: 'Testaufnahme gestartet' });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+}
+
+module.exports = { showSettings, saveSettings, testMail, changePassword, testMotion };
