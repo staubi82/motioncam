@@ -20,21 +20,24 @@ function isStopScheduled() {
   return _stopTimer !== null;
 }
 
-async function startRecording() {
+async function startRecording(skipCooldown = false) {
   if (ffmpegService.isRecording()) return;
 
   const recordingEnabled = settingsService.getBool('recording_enabled');
   if (!recordingEnabled) return;
 
-  // Cooldown check
-  const cooldown = settingsService.getInt('event_cooldown_seconds');
   const db = getDb();
-  const lastEvent = db.prepare(
-    "SELECT occurred_at FROM events WHERE type='motion_start' ORDER BY id DESC LIMIT 1"
-  ).get();
-  if (lastEvent) {
-    const lastTime = new Date(lastEvent.occurred_at).getTime();
-    if (Date.now() - lastTime < cooldown * 1000) return;
+
+  // Cooldown check
+  if (!skipCooldown) {
+    const cooldown = settingsService.getInt('event_cooldown_seconds');
+    const lastEvent = db.prepare(
+      "SELECT occurred_at FROM events WHERE type='motion_start' ORDER BY id DESC LIMIT 1"
+    ).get();
+    if (lastEvent) {
+      const lastTime = new Date(lastEvent.occurred_at + 'Z').getTime();
+      if (Date.now() - lastTime < cooldown * 1000) return;
+    }
   }
 
   const now = new Date();

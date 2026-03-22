@@ -64,4 +64,20 @@ describe('recordingService', () => {
     jest.runAllTimers();
     jest.useRealTimers();
   });
+
+  test('startRecording(skipCooldown=true) bypasses cooldown', async () => {
+    ffmpegService.spawn.mockReturnValue({ pid: 1 });
+
+    // Insert a very recent motion_start event to trigger cooldown
+    const db = getDb();
+    db.prepare("INSERT INTO events (type) VALUES ('motion_start')").run();
+
+    // Without skipCooldown: should be blocked by cooldown
+    await recordingService.startRecording();
+    expect(ffmpegService.spawn).not.toHaveBeenCalled();
+
+    // With skipCooldown=true: should start despite cooldown
+    await recordingService.startRecording(true);
+    expect(ffmpegService.spawn).toHaveBeenCalledTimes(1);
+  });
 });
