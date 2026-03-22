@@ -20,6 +20,16 @@ beforeAll(() => {
   getDb().prepare('DELETE FROM recordings').run();
 });
 
+describe('is_favorite migration', () => {
+  test('recordings table has is_favorite column after migration', () => {
+    const { getDb } = require('../../src/db');
+    const cols = getDb().prepare('PRAGMA table_info(recordings)').all();
+    const col = cols.find(c => c.name === 'is_favorite');
+    expect(col).toBeDefined();
+    expect(col.dflt_value).toBe('0');
+  });
+});
+
 describe('dashboardService.getStats', () => {
   test('returns stats object with expected keys', () => {
     const stats = dashboardService.getStats();
