@@ -35,6 +35,7 @@ const DEFAULTS = [
   ['overlay_show_location', 'true'],
   ['overlay_location_name', ''],
   ['overlay_position', 'top-left'],
+  ['max_clip_duration_seconds', '0'],
 ];
 
 function runSeeds() {

@@ -8,7 +8,7 @@ const recordingService = require('../services/recordingService');
 
 const EDITABLE_KEYS = [
   'detection_enabled', 'detection_sensitivity', 'detection_min_area', 'event_cooldown_seconds',
-  'recording_enabled', 'recording_nachlaufzeit_seconds', 'video_fps', 'video_resolution',
+  'recording_enabled', 'recording_nachlaufzeit_seconds', 'max_clip_duration_seconds', 'video_fps', 'video_resolution',
   'video_bitrate', 'audio_enabled', 'audio_bitrate', 'storage_path', 'thumbnail_path',
   'snapshot_path', 'camera_device', 'audio_device',
   'mail_enabled', 'mail_cooldown_seconds', 'mail_snapshot_attach',

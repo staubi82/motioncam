@@ -9,11 +9,13 @@ const mailService = require('./mailService');
 let _currentRecordingId = null;
 let _currentFilepath = null;
 let _stopTimer = null;
+let _maxDurationTimer = null;
 
 function reset() {
   _currentRecordingId = null;
   _currentFilepath = null;
   if (_stopTimer) { clearTimeout(_stopTimer); _stopTimer = null; }
+  if (_maxDurationTimer) { clearTimeout(_maxDurationTimer); _maxDurationTimer = null; }
 }
 
 function isStopScheduled() {
@@ -66,6 +68,16 @@ async function startRecording(skipCooldown = false) {
 
   ffmpegService.spawn(filepath, opts);
 
+  // Max-clip-duration rotation
+  const maxDur = settingsService.getInt('max_clip_duration_seconds');
+  if (maxDur > 0) {
+    _maxDurationTimer = setTimeout(async () => {
+      _maxDurationTimer = null;
+      await _finishRecording();
+      await startRecording(true);
+    }, maxDur * 1000);
+  }
+
   // Log event
   const eventResult = db.prepare(
     "INSERT INTO events (type) VALUES ('motion_start')"
@@ -85,6 +97,7 @@ async function startRecording(skipCooldown = false) {
 
 function scheduleStop() {
   if (_stopTimer) return;
+  if (_maxDurationTimer) { clearTimeout(_maxDurationTimer); _maxDurationTimer = null; }
   const nachlaufzeit = settingsService.getInt('recording_nachlaufzeit_seconds') || 30;
   _stopTimer = setTimeout(() => _finishRecording(), nachlaufzeit * 1000);
 }

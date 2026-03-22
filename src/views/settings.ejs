@@ -66,6 +66,17 @@
       <p class="field-hint">Wie lange nach der letzten Bewegung weiter aufgenommen wird (= auch Dauer der Testaufnahme).</p>
     </div>
 
+    <div style="margin-top:1rem;">
+      <label class="form-label">Max. Clip-Länge
+        <select class="form-input" name="max_clip_duration_seconds">
+          <% [[0,'Unbegrenzt'],[30,'30 s'],[60,'60 s'],[120,'120 s'],[300,'300 s']].forEach(([v,l]) => { %>
+          <option value="<%= v %>" <%= settings.max_clip_duration_seconds == v ? 'selected' : '' %>><%= l %></option>
+          <% }) %>
+        </select>
+      </label>
+      <p class="field-hint">Bei Ablauf wird automatisch ein neuer Clip gestartet falls noch Bewegung aktiv ist.</p>
+    </div>
+
     <div class="field-row" style="margin-top:1rem;">
       <div>
         <label class="form-label">Auflösung

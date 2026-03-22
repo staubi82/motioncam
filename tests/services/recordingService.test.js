@@ -80,4 +80,68 @@ describe('recordingService', () => {
     await recordingService.startRecording(true);
     expect(ffmpegService.spawn).toHaveBeenCalledTimes(1);
   });
+
+  test('max_clip_duration > 0 rotates clip after timeout', async () => {
+    jest.useFakeTimers();
+    settingsService.set('max_clip_duration_seconds', '60');
+    ffmpegService.spawn.mockReturnValue({ pid: 1 });
+    ffmpegService.stop.mockResolvedValue();
+    thumbnailService.process.mockResolvedValue({
+      duration: 60, fileSize: 5000, width: 1280, height: 720, thumbnailPath: '/tmp/t.jpg'
+    });
+    // Second startRecording (after rotation) should see isRecording=false, then set to true
+    ffmpegService.isRecording
+      .mockReturnValueOnce(false)  // initial startRecording check
+      .mockReturnValueOnce(false)  // rotation: startRecording(true) check
+      .mockReturnValue(true);      // block any further recursive starts
+
+    await recordingService.startRecording(true);
+    expect(ffmpegService.spawn).toHaveBeenCalledTimes(1);
+
+    // Advance exactly 60s so only the first max-duration timer fires
+    await jest.advanceTimersByTimeAsync(60000);
+    expect(ffmpegService.stop).toHaveBeenCalledTimes(1);
+    expect(ffmpegService.spawn).toHaveBeenCalledTimes(2);
+
+    jest.useRealTimers();
+    settingsService.set('max_clip_duration_seconds', '0');
+  });
+
+  test('max_clip_duration = 0 does not rotate clip', async () => {
+    jest.useFakeTimers();
+    settingsService.set('max_clip_duration_seconds', '0');
+    ffmpegService.spawn.mockReturnValue({ pid: 1 });
+    ffmpegService.stop.mockResolvedValue();
+
+    await recordingService.startRecording(true);
+    expect(ffmpegService.spawn).toHaveBeenCalledTimes(1);
+
+    await jest.runAllTimersAsync();
+    expect(ffmpegService.stop).not.toHaveBeenCalled();
+    expect(ffmpegService.spawn).toHaveBeenCalledTimes(1);
+
+    jest.useRealTimers();
+  });
+
+  test('scheduleStop cancels _maxDurationTimer', async () => {
+    jest.useFakeTimers();
+    settingsService.set('max_clip_duration_seconds', '60');
+    ffmpegService.spawn.mockReturnValue({ pid: 1 });
+    ffmpegService.stop.mockResolvedValue();
+    thumbnailService.process.mockResolvedValue({
+      duration: 5, fileSize: 500, width: 1280, height: 720, thumbnailPath: '/tmp/t.jpg'
+    });
+
+    await recordingService.startRecording(true);
+    recordingService.scheduleStop();
+
+    // scheduleStop fires (nachlaufzeit), rotation should NOT start a second clip
+    await jest.runAllTimersAsync();
+    // Only one spawn (from start), stop called once by scheduleStop
+    expect(ffmpegService.spawn).toHaveBeenCalledTimes(1);
+    expect(ffmpegService.stop).toHaveBeenCalledTimes(1);
+
+    jest.useRealTimers();
+    settingsService.set('max_clip_duration_seconds', '0');
+  });
 });
