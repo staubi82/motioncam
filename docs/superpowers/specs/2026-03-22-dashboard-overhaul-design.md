@@ -79,7 +79,7 @@ Each card has a 2px colored top border as visual type indicator:
 
 - Thumbnail grid, `aspect-ratio: 16/9` per thumb
 - On hover: gradient overlay slides up from bottom with date + duration
-- Top-right star icon on hover (for quick-favorite, future feature)
+- Top-right star icon rendered as static visual element on hover (no JS, no event listener — future feature placeholder)
 - "Alle ansehen →" link top-right of section header
 
 ### 5. Favorites (4-column → 2-column on mobile)
@@ -95,10 +95,11 @@ Each card has a 2px colored top border as visual type indicator:
 ### `dashboardService.js` — new function: `getLast7DaysActivity()`
 
 ```js
-// Returns array of 7 objects: [{label: 'Mo', count: N}, ...]
+// Returns array of 7 objects: [{label: 'Mo', count: N, isToday: bool}, ...]
 // SQL: GROUP BY date(created_at) for last 7 days
 // Fill missing days with count: 0
 // Labels in German: Mo Di Mi Do Fr Sa So
+// Last entry always has isToday: true — used by template to highlight today's bar
 ```
 
 ### `dashboardController.js`
@@ -123,6 +124,7 @@ stats.last7Days = await dashboardService.getLast7DaysActivity();
 | `src/views/dashboard.ejs` | Full rewrite with new sections and inline SVG chart |
 | `src/services/dashboardService.js` | Add `getLast7DaysActivity()` |
 | `src/controllers/dashboardController.js` | Pass `last7Days` to view |
+| `public/js/dashboard.js` | No changes — system status polling already works |
 
 ---
 
