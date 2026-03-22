@@ -30,6 +30,7 @@ beforeAll(() => {
   a.use(session({ secret: 'test', resave: false, saveUninitialized: false }));
   a.use((req, res, next) => { req.session.userId = 1; next(); });
   a.use('/api', require('../../src/routes/api'));
+  a.use((err, req, res, next) => { res.status(err.status || 500).json({ error: err.message }); });
   app = a;
 });
 
@@ -60,5 +61,13 @@ describe('GET /api/system-status', () => {
     expect(res.body).toHaveProperty('tempCelsius', 55);
     expect(res.body).toHaveProperty('diskUsedMB', 200);
     expect(res.body).toHaveProperty('diskTotalMB', 28000);
+  });
+
+  test('returns 500 when service rejects', async () => {
+    systemService.getCpuPercent.mockRejectedValueOnce(new Error('cpu fail'));
+    const res = await request(app).get('/api/system-status');
+    expect(res.status).toBe(500);
+    // Restore mock for subsequent tests
+    systemService.getCpuPercent.mockResolvedValue(42);
   });
 });
