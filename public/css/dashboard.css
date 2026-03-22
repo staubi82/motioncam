@@ -9,3 +9,7 @@
 .favorites-section { margin-top: 2rem; }
 .favorites-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
 .favorites-header h2 { font-size: 1.1rem; margin: 0; }
+.favorites-section .archive-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; }
+.favorites-section .recording-card__info { padding: 0.3rem 0.5rem; }
+.favorites-section .recording-card__name { font-size: 0.75rem; }
+.favorites-section .recording-card__date { font-size: 0.7rem; }
