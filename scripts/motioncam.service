@@ -4,12 +4,12 @@ After=network.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/motioncam
+User=root
+WorkingDirectory=/root/motioncam
 ExecStart=/usr/bin/node src/server.js
 Restart=on-failure
 RestartSec=5
-EnvironmentFile=/home/pi/motioncam/.env
+EnvironmentFile=/root/motioncam/.env
 StandardOutput=journal
 StandardError=journal
 
