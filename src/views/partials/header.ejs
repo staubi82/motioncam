@@ -1,0 +1,13 @@
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="/dashboard">MotionCam</a>
+    <button class="hamburger" aria-label="Menu">&#9776;</button>
+    <nav class="main-nav">
+      <a href="/dashboard" class="nav-link <%= typeof title !== 'undefined' && title === 'Dashboard' ? 'active' : '' %>">Dashboard</a>
+      <a href="/live" class="nav-link <%= typeof title !== 'undefined' && title === 'Live' ? 'active' : '' %>">Live</a>
+      <a href="/archive" class="nav-link <%= typeof title !== 'undefined' && title === 'Archiv' ? 'active' : '' %>">Archiv</a>
+      <a href="/settings" class="nav-link <%= typeof title !== 'undefined' && title === 'Einstellungen' ? 'active' : '' %>">Einstellungen</a>
+      <a href="/logout" class="nav-link nav-link--logout">Abmelden</a>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,28 @@
+# motion.conf — Example configuration for MotionCam
+daemon off
+log_level 5
+videodevice /dev/video0
+width 1280
+height 720
+framerate 15
+threshold 1500
+minimum_motion_frames 2
+event_gap 5
+
+# MJPEG stream on port 8081
+stream_port 8081
+stream_localhost on
+stream_quality 75
+stream_maxrate 5
+
+# Snapshot (latest frame)
+snapshot_interval 0
+snapshot_filename /var/lib/motion/lastsnap
+picture_output off
+
+# Movie output: disabled — FFmpeg handles this
+movie_output off
+
+# Hooks — Node.js app must be running on port 3000
+on_event_start curl -s -X POST http://localhost:3000/api/hooks/motion-start -H "X-Hook-Secret: YOUR_HOOK_SECRET"
+on_event_end curl -s -X POST http://localhost:3000/api/hooks/motion-end -H "X-Hook-Secret: YOUR_HOOK_SECRET"

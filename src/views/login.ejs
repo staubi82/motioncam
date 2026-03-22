@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MotionCam — Login</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <h1 class="login-title">MotionCam</h1>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="flash flash--error"><%= error %></div>
+    <% } %>
+    <form method="post" action="/login" class="login-form">
+      <label class="form-label" for="username">Benutzername</label>
+      <input class="form-input" type="text" id="username" name="username" required autofocus>
+      <label class="form-label" for="password">Passwort</label>
+      <input class="form-input" type="password" id="password" name="password" required>
+      <button class="btn btn--primary btn--full" type="submit">Anmelden</button>
+    </form>
+  </div>
+</body>
+</html>

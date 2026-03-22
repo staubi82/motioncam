@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MotionCam</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <%- typeof pageCSS !== 'undefined' ? `<link rel="stylesheet" href="/css/${pageCSS}.css">` : '' %>
+</head>
+<body>
+  <%- include('../partials/header') %>
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+    <%- body %>
+  </main>
+  <%- include('../partials/footer') %>
+  <%- typeof pageJS !== 'undefined' ? `<script type="module" src="/js/${pageJS}.js"></script>` : '' %>
+</body>
+</html>

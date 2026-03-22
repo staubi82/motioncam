@@ -1,0 +1,33 @@
+<% title = 'Archiv'; pageCSS = 'archive'; pageJS = 'archive'; %>
+<div class="archive-header">
+  <h1>Archiv</h1>
+  <span class="archive-count"><%= total %> Aufnahmen</span>
+</div>
+<% if (recordings.length === 0) { %>
+  <p class="empty-state">Noch keine Aufnahmen vorhanden.</p>
+<% } else { %>
+  <div class="archive-grid">
+    <% for (const rec of recordings) { %>
+      <div class="recording-card" data-id="<%= rec.id %>">
+        <a href="/videos/<%= rec.id %>" class="recording-card__link">
+          <% if (rec.thumbnail_path) { %>
+            <img src="/thumbnails/<%= require('path').basename(rec.thumbnail_path) %>" alt="" class="recording-card__thumb">
+          <% } else { %>
+            <div class="recording-card__no-thumb">Kein Thumbnail</div>
+          <% } %>
+          <div class="recording-card__info">
+            <div class="recording-card__name"><%= rec.filename %></div>
+            <div class="recording-card__date"><%= new Date(rec.created_at).toLocaleString('de-DE') %></div>
+            <% if (rec.duration_seconds) { %><div class="recording-card__dur"><%= Math.round(rec.duration_seconds) %>s</div><% } %>
+          </div>
+        </a>
+        <button class="btn btn--danger btn--sm delete-btn" data-id="<%= rec.id %>">Löschen</button>
+      </div>
+    <% } %>
+  </div>
+  <div class="pagination">
+    <% if (page > 1) { %><a href="/archive?page=<%= page - 1 %>" class="btn btn--secondary">Zurück</a><% } %>
+    <span>Seite <%= page %> / <%= totalPages %></span>
+    <% if (page < totalPages) { %><a href="/archive?page=<%= page + 1 %>" class="btn btn--secondary">Weiter</a><% } %>
+  </div>
+<% } %>
