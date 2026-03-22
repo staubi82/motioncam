@@ -43,7 +43,8 @@ async function startRecording(skipCooldown = false) {
   }
 
   const now = new Date();
-  const filename = now.toISOString().replace(/[:.]/g, '-').replace('T', '_').slice(0, 19) + '.mp4';
+  const pad = n => String(n).padStart(2, '0');
+  const filename = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}.mp4`;
   const storagePath = settingsService.get('storage_path');
   const filepath = path.join(storagePath, filename);
 

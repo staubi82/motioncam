@@ -54,7 +54,7 @@ function spawn(outputPath, opts) {
 
   const isHttpSource = opts.cameraDevice.startsWith('http');
   const args = isHttpSource
-    ? ['-i', opts.cameraDevice]
+    ? ['-use_wallclock_as_timestamps', '1', '-i', opts.cameraDevice]
     : ['-f', 'v4l2', '-i', opts.cameraDevice];
 
   if (opts.audioEnabled) {
