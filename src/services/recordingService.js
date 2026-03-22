@@ -53,6 +53,15 @@ async function startRecording(skipCooldown = false) {
     videoBitrate: settingsService.get('video_bitrate'),
     audioBitrate: settingsService.get('audio_bitrate'),
     audioEnabled: settingsService.getBool('audio_enabled'),
+    overlaySettings: {
+      overlay_enabled:         settingsService.get('overlay_enabled'),
+      overlay_show_datetime:   settingsService.get('overlay_show_datetime'),
+      overlay_show_resolution: settingsService.get('overlay_show_resolution'),
+      overlay_show_location:   settingsService.get('overlay_show_location'),
+      overlay_location_name:   settingsService.get('overlay_location_name'),
+      overlay_position:        settingsService.get('overlay_position'),
+      video_resolution:        settingsService.get('video_resolution'),
+    },
   };
 
   ffmpegService.spawn(filepath, opts);
