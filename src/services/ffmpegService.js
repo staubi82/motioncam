@@ -52,9 +52,10 @@ function reset() {
 function spawn(outputPath, opts) {
   if (_proc) throw new Error('FFmpeg already running');
 
-  const args = [
-    '-f', 'v4l2', '-i', opts.cameraDevice,
-  ];
+  const isHttpSource = opts.cameraDevice.startsWith('http');
+  const args = isHttpSource
+    ? ['-i', opts.cameraDevice]
+    : ['-f', 'v4l2', '-i', opts.cameraDevice];
 
   if (opts.audioEnabled) {
     args.push('-f', 'alsa', '-i', opts.audioDevice);

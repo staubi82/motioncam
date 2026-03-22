@@ -73,6 +73,26 @@ describe('ffmpegService', () => {
     expect(args[vfIndex + 1]).toContain('drawtext=');
   });
 
+  test('spawn uses HTTP input without -f v4l2 when cameraDevice is a URL', () => {
+    const proc = makeMockProcess();
+    spawn.mockReturnValue(proc);
+
+    ffmpegService.spawn('/tmp/test.mp4', {
+      cameraDevice: 'http://localhost:8081',
+      audioDevice: 'hw:1,0',
+      videoFps: '15',
+      videoResolution: '1280x720',
+      videoBitrate: '2000k',
+      audioBitrate: '128k',
+      audioEnabled: false,
+    });
+
+    const args = spawn.mock.calls[0][1];
+    expect(args).toContain('http://localhost:8081');
+    expect(args).not.toContain('-f');
+    expect(args).not.toContain('v4l2');
+  });
+
   test('stop sends SIGINT and resolves when process exits', async () => {
     const proc = makeMockProcess();
     spawn.mockReturnValue(proc);
