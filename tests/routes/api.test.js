@@ -22,8 +22,8 @@ beforeAll(() => {
   ).run();
   settingsService.loadAll();
   dashboardService.getStats.mockReturnValue({
-    totalRecordings: 5, todayCount: 2, totalDuration: 120, diskUsage: 1000,
-    isRecording: false, latestRecording: null,
+    totalRecordings: 5, todayCount: 2, totalDuration: 120,
+    isRecording: false, latestRecording: null, favoriteRecordings: [],
   });
   systemService.getCpuPercent.mockResolvedValue(42);
   systemService.getRamInfo.mockReturnValue({ ramUsedMB: 512, ramTotalMB: 1024 });

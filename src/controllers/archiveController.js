@@ -5,7 +5,7 @@ const PAGE_SIZE = 8;
 
 function showArchive(req, res, next) {
   try {
-    const page = Math.max(1, parseInt(req.query.page || '1', 10));
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const offset = (page - 1) * PAGE_SIZE;
     const favoritesActive = req.query.favorites === '1';
     const db = getDb();
