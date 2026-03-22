@@ -238,25 +238,37 @@
     <section class="settings-section settings-section--wide" id="email">
       <h2>E-Mail</h2>
 
-      <div class="field-row" style="margin-bottom:1.25rem;">
-        <div class="settings-row">
-          <span class="settings-row__label">E-Mail-Benachrichtigungen</span>
-          <label class="toggle-row">
-            <span class="toggle">
-              <input type="checkbox" name="mail_enabled" value="true" <%= settings.mail_enabled === 'true' ? 'checked' : '' %>>
-              <span class="toggle-track"></span>
-            </span>
-          </label>
-        </div>
-        <div class="settings-row">
-          <span class="settings-row__label">Snapshot anhängen</span>
-          <label class="toggle-row">
-            <span class="toggle">
-              <input type="checkbox" name="mail_snapshot_attach" value="true" <%= settings.mail_snapshot_attach === 'true' ? 'checked' : '' %>>
-              <span class="toggle-track"></span>
-            </span>
-          </label>
-        </div>
+      <div class="settings-row">
+        <span class="settings-row__label">E-Mail-Benachrichtigungen</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="mail_enabled" value="true" <%= settings.mail_enabled === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row__label">Snapshot anhängen</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="mail_snapshot_attach" value="true" <%= settings.mail_snapshot_attach === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+      <div class="settings-row" style="margin-bottom:1.25rem;">
+        <span class="settings-row__label">TLS verwenden</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="smtp_tls" value="true" <%= settings.smtp_tls === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="field-row" style="margin-top:1rem;">
         <div class="field-group">
           <label class="form-label">Mail-Cooldown
             <select class="form-input" name="mail_cooldown_seconds">
@@ -267,11 +279,6 @@
           </label>
           <p class="field-hint">Mindestpause zwischen zwei Benachrichtigungs-E-Mails.</p>
         </div>
-      </div>
-
-      <div class="settings-divider"></div>
-
-      <div class="field-row">
         <div class="field-group">
           <label class="form-label">SMTP-Host
             <input class="form-input" type="text" name="smtp_host" value="<%= settings.smtp_host %>">
@@ -285,17 +292,6 @@
               <% }) %>
             </select>
           </label>
-        </div>
-        <div class="field-group">
-          <div class="settings-row" style="padding-top:1.6rem;">
-            <span class="settings-row__label">TLS verwenden</span>
-            <label class="toggle-row">
-              <span class="toggle">
-                <input type="checkbox" name="smtp_tls" value="true" <%= settings.smtp_tls === 'true' ? 'checked' : '' %>>
-                <span class="toggle-track"></span>
-              </span>
-            </label>
-          </div>
         </div>
       </div>
 
