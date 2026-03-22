@@ -1,5 +1,43 @@
 'use strict';
 const { spawn: spawnProcess } = require('child_process');
+const fs = require('fs');
+
+const DEJAVU_FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf';
+const FONT_ARG = fs.existsSync(DEJAVU_FONT) ? `:fontfile=${DEJAVU_FONT}` : '';
+
+const POSITION_MAP = {
+  'top-left':     { x: '10',      y: '10' },
+  'top-right':    { x: 'w-tw-10', y: '10' },
+  'bottom-left':  { x: '10',      y: 'h-th-10' },
+  'bottom-right': { x: 'w-tw-10', y: 'h-th-10' },
+};
+
+function escapeDrawtext(str) {
+  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/:/g, '\\:').replace(/%/g, '\\%');
+}
+
+function buildOverlayFilter(settings) {
+  if (settings.overlay_enabled !== 'true') return null;
+
+  const parts = [];
+  if (settings.overlay_show_datetime === 'true') {
+    parts.push('%{localtime\\:%d.%m.%Y %H\\:%M\\:%S}');
+  }
+  if (settings.overlay_show_resolution === 'true') {
+    parts.push(escapeDrawtext(settings.video_resolution || ''));
+  }
+  if (settings.overlay_show_location === 'true' && settings.overlay_location_name) {
+    parts.push(escapeDrawtext(settings.overlay_location_name));
+  }
+
+  if (parts.length === 0) return null;
+
+  const pos = POSITION_MAP[settings.overlay_position] || POSITION_MAP['top-left'];
+  const text = parts.join('\\n');
+
+  const fontPart = FONT_ARG ? `fontfile=${DEJAVU_FONT}:` : '';
+  return `drawtext=${fontPart}fontsize=20:fontcolor=white:box=1:boxcolor=black@0.5:boxborderw=4:x=${pos.x}:y=${pos.y}:text='${text}'`;
+}
 
 let _proc = null;
 
@@ -22,13 +60,21 @@ function spawn(outputPath, opts) {
     args.push('-f', 'alsa', '-i', opts.audioDevice);
   }
 
+  const overlayFilter = buildOverlayFilter(opts.overlaySettings || {});
+
   args.push(
     '-c:v', 'libx264',
     '-preset', 'fast',
     '-b:v', opts.videoBitrate,
     '-r', String(opts.videoFps),
-    '-s', opts.videoResolution,
   );
+
+  if (overlayFilter) {
+    const [w, h] = (opts.videoResolution || '1280x720').split('x');
+    args.push('-vf', `scale=${w}:${h},${overlayFilter}`);
+  } else {
+    args.push('-s', opts.videoResolution);
+  }
 
   if (opts.audioEnabled) {
     args.push('-c:a', 'aac', '-b:a', opts.audioBitrate);
@@ -52,4 +98,4 @@ function stop() {
   });
 }
 
-module.exports = { spawn, stop, isRecording, reset };
+module.exports = { spawn, stop, isRecording, reset, buildOverlayFilter };

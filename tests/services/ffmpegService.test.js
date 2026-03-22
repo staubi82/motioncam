@@ -4,6 +4,7 @@ const { spawn } = require('child_process');
 const EventEmitter = require('events');
 
 const ffmpegService = require('../../src/services/ffmpegService');
+const { buildOverlayFilter } = require('../../src/services/ffmpegService');
 
 function makeMockProcess() {
   const proc = new EventEmitter();
@@ -60,5 +61,71 @@ describe('ffmpegService', () => {
     proc.emit('close', 0);
     await stopPromise;
     expect(ffmpegService.isRecording()).toBe(false);
+  });
+});
+
+describe('buildOverlayFilter', () => {
+  const base = {
+    overlay_enabled: 'true',
+    overlay_show_datetime: 'true',
+    overlay_show_resolution: 'false',
+    overlay_show_location: 'false',
+    overlay_location_name: '',
+    overlay_position: 'top-left',
+    video_resolution: '1280x720',
+  };
+
+  test('returns null when overlay disabled', () => {
+    expect(buildOverlayFilter({ ...base, overlay_enabled: 'false' })).toBeNull();
+  });
+
+  test('returns null when no fields enabled', () => {
+    expect(buildOverlayFilter({
+      ...base,
+      overlay_show_datetime: 'false',
+    })).toBeNull();
+  });
+
+  test('returns filter string with position top-left', () => {
+    const result = buildOverlayFilter(base);
+    expect(result).toContain('drawtext=');
+    expect(result).toContain('x=10');
+    expect(result).toContain('y=10');
+    expect(result).toContain('localtime');
+  });
+
+  test('returns filter with bottom-right position', () => {
+    const result = buildOverlayFilter({ ...base, overlay_position: 'bottom-right' });
+    expect(result).toContain('x=w-tw-10');
+    expect(result).toContain('y=h-th-10');
+  });
+
+  test('includes resolution when enabled', () => {
+    const result = buildOverlayFilter({ ...base, overlay_show_resolution: 'true' });
+    expect(result).toContain('1280x720');
+  });
+
+  test('includes location when enabled and non-empty', () => {
+    const result = buildOverlayFilter({
+      ...base,
+      overlay_show_location: 'true',
+      overlay_location_name: 'Eingang',
+    });
+    expect(result).toContain('Eingang');
+  });
+
+  test('escapes special chars in location name', () => {
+    const result = buildOverlayFilter({
+      ...base,
+      overlay_show_location: 'true',
+      overlay_location_name: "Eingang: 1's",
+    });
+    expect(result).toContain("Eingang\\: 1\\'s");
+  });
+
+  test('falls back to top-left for invalid position', () => {
+    const result = buildOverlayFilter({ ...base, overlay_position: 'center' });
+    expect(result).toContain('x=10');
+    expect(result).toContain('y=10');
   });
 });
