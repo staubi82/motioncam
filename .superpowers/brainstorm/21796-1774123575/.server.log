@@ -1,6 +1,0 @@
-{"type":"server-started","port":57936,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:57936","screen_dir":"/home/staubi/Apps/motion/.superpowers/brainstorm/21796-1774123575"}
-{"type":"screen-added","file":"/home/staubi/Apps/motion/.superpowers/brainstorm/21796-1774123575/architecture.html"}
-{"type":"screen-added","file":"/home/staubi/Apps/motion/.superpowers/brainstorm/21796-1774123575/ui-layout.html"}
-{"type":"screen-added","file":"/home/staubi/Apps/motion/.superpowers/brainstorm/21796-1774123575/dashboard-mockup.html"}
-{"type":"screen-added","file":"/home/staubi/Apps/motion/.superpowers/brainstorm/21796-1774123575/archive-mockup.html"}
-{"type":"server-stopped","reason":"idle timeout"}
