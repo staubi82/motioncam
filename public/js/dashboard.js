@@ -85,6 +85,12 @@ async function refreshSystem() {
       if (diskBar) diskBar.style.width = diskPct + '%';
       const freeMB = s.diskTotalMB - s.diskUsedMB;
       if (diskSub) diskSub.textContent = (freeMB > 1024 ? (freeMB / 1024).toFixed(1) + ' GB' : freeMB + ' MB') + ' frei';
+      // Update disk stat card color based on usage
+      const diskCard = document.getElementById('stat-disk');
+      if (diskCard) {
+        diskCard.classList.remove('stat-card--green', 'stat-card--amber', 'stat-card--red');
+        diskCard.classList.add('stat-card--' + barColor(diskPct));
+      }
     }
     // Temp
     if (s.tempCelsius !== null) {

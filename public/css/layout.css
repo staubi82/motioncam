@@ -114,6 +114,26 @@
   flex-shrink: 0;
 }
 .avatar:hover { opacity: 0.85; }
+.avatar::after {
+  content: 'Abmelden';
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.avatar:hover::after {
+  opacity: 1;
+}
 
 /* ── Main content ── */
 .main-content {
