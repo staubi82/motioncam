@@ -65,7 +65,7 @@ function spawn(outputPath, opts) {
 
   args.push(
     '-c:v', 'libx264',
-    '-preset', 'fast',
+    '-preset', isHttpSource ? 'ultrafast' : 'fast',
     '-b:v', opts.videoBitrate,
     '-r', String(opts.videoFps),
   );
