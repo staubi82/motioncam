@@ -7,3 +7,4 @@ sessions/
 .env
 *.db
 firebase-debug.log
+sessions/
