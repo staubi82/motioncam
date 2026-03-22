@@ -37,6 +37,31 @@
     <div class="stat-value">…</div>
   </div>
 </div>
+<% if (stats.favoriteRecordings && stats.favoriteRecordings.length > 0) { %>
+  <div class="favorites-section">
+    <div class="favorites-header">
+      <h2>Favoriten</h2>
+      <a href="/archive?favorites=1" class="btn btn--sm btn--secondary">Alle Favoriten →</a>
+    </div>
+    <div class="archive-grid">
+      <% for (const rec of stats.favoriteRecordings) { %>
+        <div class="recording-card">
+          <a href="/videos/<%= rec.id %>" class="recording-card__link">
+            <% if (rec.thumbnail_path) { %>
+              <img src="/thumbnails/<%= rec.thumbnail_path.split('/').pop() %>" alt="" class="recording-card__thumb">
+            <% } else { %>
+              <div class="recording-card__no-thumb">Kein Thumbnail</div>
+            <% } %>
+            <div class="recording-card__info">
+              <div class="recording-card__name"><%= rec.filename %></div>
+              <div class="recording-card__date"><%= new Date(rec.created_at).toLocaleString('de-DE') %></div>
+            </div>
+          </a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+<% } %>
 <% if (stats.latestRecording) { %>
   <div class="latest-recording">
     <h2>Letzte Aufnahme</h2>

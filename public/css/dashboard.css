@@ -6,3 +6,6 @@
 .latest-recording h2 { font-size: 1.1rem; margin-bottom: 1rem; }
 .recording-link { display: flex; align-items: center; gap: 1rem; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.75rem; color: var(--text); }
 .recording-link .thumb { width: 80px; height: 45px; object-fit: cover; border-radius: 4px; }
+.favorites-section { margin-top: 2rem; }
+.favorites-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.favorites-header h2 { font-size: 1.1rem; margin: 0; }

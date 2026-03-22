@@ -16,8 +16,11 @@ function getStats() {
     "SELECT COUNT(*) as n FROM recordings WHERE date(created_at)=date('now')"
   ).get().n;
   const isRecording = ffmpegService.isRecording();
+  const favoriteRecordings = db.prepare(
+    'SELECT * FROM recordings WHERE processed=1 AND is_favorite=1 ORDER BY created_at DESC LIMIT 6'
+  ).all();
 
-  return { totalRecordings, latestRecording, totalDuration, todayCount, isRecording };
+  return { totalRecordings, latestRecording, totalDuration, todayCount, isRecording, favoriteRecordings };
 }
 
 module.exports = { getStats };

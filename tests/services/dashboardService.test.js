@@ -44,3 +44,28 @@ describe('dashboardService.getStats', () => {
     expect(dashboardService.getStats().totalRecordings).toBe(0);
   });
 });
+
+describe('dashboardService.getStats — favoriteRecordings', () => {
+  test('returns favoriteRecordings array', () => {
+    const stats = dashboardService.getStats();
+    expect(stats).toHaveProperty('favoriteRecordings');
+    expect(Array.isArray(stats.favoriteRecordings)).toBe(true);
+  });
+
+  test('favoriteRecordings contains only is_favorite=1 recordings, max 6', () => {
+    const { getDb } = require('../../src/db');
+    const db = getDb();
+    // Insert 7 favorites and 1 non-favorite
+    for (let i = 1; i <= 7; i++) {
+      db.prepare(
+        `INSERT INTO recordings (filename, filepath, processed, is_favorite) VALUES ('fav${i}.mp4', '/tmp/fav${i}.mp4', 1, 1)`
+      ).run();
+    }
+    db.prepare(
+      "INSERT INTO recordings (filename, filepath, processed, is_favorite) VALUES ('nonfav.mp4', '/tmp/nonfav.mp4', 1, 0)"
+    ).run();
+    const stats = dashboardService.getStats();
+    expect(stats.favoriteRecordings.length).toBeLessThanOrEqual(6);
+    expect(stats.favoriteRecordings.every(r => r.is_favorite === 1)).toBe(true);
+  });
+});
