@@ -1,13 +1,56 @@
+<%
+  const _pages = [
+    { href: '/dashboard', label: 'Dashboard', key: 'Dashboard' },
+    { href: '/live',      label: 'Live',       key: 'Live' },
+    { href: '/archive',   label: 'Archiv',     key: 'Archiv' },
+    { href: '/settings',  label: 'Einstellungen', key: 'Einstellungen' },
+  ];
+  const _initial = (typeof username !== 'undefined' && username) ? username[0].toUpperCase() : 'U';
+%>
 <header class="site-header">
   <div class="header-inner">
-    <a class="logo" href="/dashboard">MotionCam</a>
-    <button class="hamburger" aria-label="Menu">&#9776;</button>
+    <a class="logo" href="/dashboard">
+      <span class="logo-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.89L15 14"/>
+          <rect x="3" y="7" width="12" height="10" rx="2"/>
+        </svg>
+      </span>
+      MotionCam
+    </a>
     <nav class="main-nav">
-      <a href="/dashboard" class="nav-link <%= typeof title !== 'undefined' && title === 'Dashboard' ? 'active' : '' %>">Dashboard</a>
-      <a href="/live" class="nav-link <%= typeof title !== 'undefined' && title === 'Live' ? 'active' : '' %>">Live</a>
-      <a href="/archive" class="nav-link <%= typeof title !== 'undefined' && title === 'Archiv' ? 'active' : '' %>">Archiv</a>
-      <a href="/settings" class="nav-link <%= typeof title !== 'undefined' && title === 'Einstellungen' ? 'active' : '' %>">Einstellungen</a>
-      <a href="/logout" class="nav-link nav-link--logout">Abmelden</a>
+      <% for (const p of _pages) { %>
+        <a href="<%= p.href %>" class="nav-link <%= typeof title !== 'undefined' && title === p.key ? 'active' : '' %>">
+          <%= p.label %>
+        </a>
+      <% } %>
     </nav>
+    <div class="header-right">
+      <span class="status-pill status-pill--idle" id="header-status-pill">
+        <span class="status-pill__dot"></span>
+        <span id="header-status-text">Bereit</span>
+      </span>
+      <a href="/logout" class="avatar" title="Abmelden (<%= typeof username !== 'undefined' ? username : '' %>)">
+        <%= _initial %>
+      </a>
+    </div>
   </div>
 </header>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav">
+  <% for (const p of _pages) { %>
+    <a href="<%= p.href %>" class="<%= typeof title !== 'undefined' && title === p.key ? 'active' : '' %>">
+      <% if (p.key === 'Dashboard') { %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <% } else if (p.key === 'Live') { %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/></svg>
+      <% } else if (p.key === 'Archiv') { %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.89L15 14"/><rect x="3" y="7" width="12" height="10" rx="2"/></svg>
+      <% } else { %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+      <% } %>
+      <%= p.label %>
+    </a>
+  <% } %>
+</nav>
