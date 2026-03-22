@@ -25,3 +25,17 @@ streamImg.addEventListener('load', () => {
     statusDiv.textContent = '';
   }
 });
+
+// Overlay clock
+const ovDatetime = document.getElementById('ov-datetime');
+if (ovDatetime) {
+  function updateClock() {
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    ovDatetime.textContent =
+      `${pad(now.getDate())}.${pad(now.getMonth()+1)}.${now.getFullYear()} ` +
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+}
