@@ -7,7 +7,7 @@ let _db = null;
 
 function getDb() {
   if (!_db) {
-    const dbPath = path.resolve(config.dbPath);
+    const dbPath = config.dbPath === ':memory:' ? ':memory:' : path.resolve(config.dbPath);
     _db = new Database(dbPath);
     _db.pragma('journal_mode = WAL');
     _db.pragma('foreign_keys = ON');
