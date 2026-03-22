@@ -14,7 +14,8 @@ function getRamInfo() {
 function getTempCelsius() {
   try {
     const raw = fs.readFileSync(TEMP_PATH, 'utf8').trim();
-    return Math.round(parseInt(raw, 10) / 1000);
+    const temp = Math.round(parseInt(raw, 10) / 1000);
+    return isNaN(temp) ? null : temp;
   } catch {
     return null;
   }
