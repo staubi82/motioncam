@@ -74,7 +74,7 @@ async function changePassword(req, res, next) {
   } catch (err) { next(err); }
 }
 
-async function testMotion(req, res) {
+async function testMotion(req, res, next) {
   try {
     if (ffmpegService.isRecording()) {
       return res.status(409).json({ ok: false, message: 'Aufnahme läuft bereits' });
@@ -103,7 +103,7 @@ async function testMotion(req, res) {
 
     res.json({ ok: true, message: 'Testaufnahme gestartet' });
   } catch (err) {
-    res.status(500).json({ ok: false, message: err.message });
+    next(err);
   }
 }
 

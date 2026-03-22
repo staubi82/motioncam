@@ -35,7 +35,7 @@ async function startRecording(skipCooldown = false) {
       "SELECT occurred_at FROM events WHERE type='motion_start' ORDER BY id DESC LIMIT 1"
     ).get();
     if (lastEvent) {
-      const lastTime = new Date(lastEvent.occurred_at + 'Z').getTime();
+      const lastTime = new Date(lastEvent.occurred_at.replace(' ', 'T') + 'Z').getTime();
       if (Date.now() - lastTime < cooldown * 1000) return;
     }
   }

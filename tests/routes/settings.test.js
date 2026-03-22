@@ -49,6 +49,17 @@ describe('testMotion controller', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ ok: true }));
   });
 
+  test('returns 409 when recording is disabled', async () => {
+    settingsService.set('recording_enabled', 'false');
+    const { testMotion } = require('../../src/controllers/settingsController');
+    const req = { body: { sendMail: false }, session: {} };
+    const res = makeRes();
+    await testMotion(req, res, jest.fn());
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ ok: false }));
+    settingsService.set('recording_enabled', 'true');
+  });
+
   test('includes mailError when smtp not configured', async () => {
     const { testMotion } = require('../../src/controllers/settingsController');
     const req = { body: { sendMail: 'true' }, session: {} };

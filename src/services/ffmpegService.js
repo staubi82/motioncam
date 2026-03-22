@@ -3,7 +3,7 @@ const { spawn: spawnProcess } = require('child_process');
 const fs = require('fs');
 
 const DEJAVU_FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf';
-const FONT_ARG = fs.existsSync(DEJAVU_FONT) ? `:fontfile=${DEJAVU_FONT}` : '';
+const FONT_AVAILABLE = fs.existsSync(DEJAVU_FONT);
 
 const POSITION_MAP = {
   'top-left':     { x: '10',      y: '10' },
@@ -35,7 +35,7 @@ function buildOverlayFilter(settings) {
   const pos = POSITION_MAP[settings.overlay_position] || POSITION_MAP['top-left'];
   const text = parts.join('\\n');
 
-  const fontPart = FONT_ARG ? `fontfile=${DEJAVU_FONT}:` : '';
+  const fontPart = FONT_AVAILABLE ? `fontfile=${DEJAVU_FONT}:` : '';
   return `drawtext=${fontPart}fontsize=20:fontcolor=white:box=1:boxcolor=black@0.5:boxborderw=4:x=${pos.x}:y=${pos.y}:text='${text}'`;
 }
 
@@ -69,11 +69,14 @@ function spawn(outputPath, opts) {
     '-r', String(opts.videoFps),
   );
 
+  const ALLOWED_RESOLUTIONS = new Set(['640x480', '1280x720', '1920x1080']);
+  const resolution = ALLOWED_RESOLUTIONS.has(opts.videoResolution) ? opts.videoResolution : '1280x720';
+
   if (overlayFilter) {
-    const [w, h] = (opts.videoResolution || '1280x720').split('x');
+    const [w, h] = resolution.split('x');
     args.push('-vf', `scale=${w}:${h},${overlayFilter}`);
   } else {
-    args.push('-s', opts.videoResolution);
+    args.push('-s', resolution);
   }
 
   if (opts.audioEnabled) {

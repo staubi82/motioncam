@@ -42,6 +42,37 @@ describe('ffmpegService', () => {
     expect(ffmpegService.isRecording()).toBe(true);
   });
 
+  test('spawn uses -vf with scale when overlay is enabled', () => {
+    const proc = makeMockProcess();
+    spawn.mockReturnValue(proc);
+
+    ffmpegService.spawn('/tmp/test.mp4', {
+      cameraDevice: '/dev/video0',
+      audioDevice: 'hw:1,0',
+      videoFps: '15',
+      videoResolution: '1280x720',
+      videoBitrate: '2000k',
+      audioBitrate: '128k',
+      audioEnabled: false,
+      overlaySettings: {
+        overlay_enabled: 'true',
+        overlay_show_datetime: 'true',
+        overlay_show_resolution: 'false',
+        overlay_show_location: 'false',
+        overlay_location_name: '',
+        overlay_position: 'top-left',
+        video_resolution: '1280x720',
+      },
+    });
+
+    const args = spawn.mock.calls[0][1];
+    expect(args).toContain('-vf');
+    expect(args).not.toContain('-s');
+    const vfIndex = args.indexOf('-vf');
+    expect(args[vfIndex + 1]).toContain('scale=1280:720');
+    expect(args[vfIndex + 1]).toContain('drawtext=');
+  });
+
   test('stop sends SIGINT and resolves when process exits', async () => {
     const proc = makeMockProcess();
     spawn.mockReturnValue(proc);
