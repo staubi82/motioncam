@@ -55,6 +55,8 @@
   background: rgba(59, 130, 246, 0.15);
   color: var(--accent);
 }
+.nav-link--logout { color: var(--danger); }
+.nav-link--logout:hover { background: rgba(248, 81, 73, 0.1); color: var(--danger); }
 .header-right {
   margin-left: auto;
   display: flex;
