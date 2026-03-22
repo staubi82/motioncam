@@ -4,6 +4,13 @@
   <div class="stream-wrapper">
     <img id="live-stream" src="/api/live/stream" alt="Live Stream" class="live-img">
     <img id="snapshot-img" src="/api/live/snapshot" alt="Snapshot" class="live-img live-img--hidden">
+    <% if (overlayConfig && overlayConfig.overlay_enabled === 'true') { %>
+    <div id="live-overlay" class="live-overlay live-overlay--<%= ['top-left','top-right','bottom-left','bottom-right'].includes(overlayConfig.overlay_position) ? overlayConfig.overlay_position : 'top-left' %>">
+      <% if (overlayConfig.overlay_show_datetime === 'true') { %><span id="ov-datetime"></span><% } %>
+      <% if (overlayConfig.overlay_show_resolution === 'true') { %><span id="ov-resolution"><%= overlayConfig.video_resolution %></span><% } %>
+      <% if (overlayConfig.overlay_show_location === 'true' && overlayConfig.overlay_location_name) { %><span id="ov-location"><%= overlayConfig.overlay_location_name %></span><% } %>
+    </div>
+    <% } %>
   </div>
   <div id="stream-status" class="stream-status"></div>
 </div>
