@@ -1,0 +1,38 @@
+<% title = 'Dashboard'; pageCSS = 'dashboard'; pageJS = 'dashboard'; %>
+<div class="dashboard-grid">
+  <div class="stat-card">
+    <div class="stat-label">Aufnahmen gesamt</div>
+    <div class="stat-value"><%= stats.totalRecordings %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Heute</div>
+    <div class="stat-value"><%= stats.todayCount %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Gesamtdauer</div>
+    <div class="stat-value"><%= Math.round(stats.totalDuration / 60) %> min</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Speicher</div>
+    <div class="stat-value"><%= (stats.diskUsage / 1024 / 1024).toFixed(1) %> MB</div>
+  </div>
+  <div class="stat-card stat-card--status">
+    <div class="stat-label">Status</div>
+    <div class="stat-value">
+      <span class="badge badge--<%= stats.isRecording ? 'danger' : 'success' %>">
+        <%= stats.isRecording ? 'Aufnahme läuft' : 'Bereit' %>
+      </span>
+    </div>
+  </div>
+</div>
+<% if (stats.latestRecording) { %>
+  <div class="latest-recording">
+    <h2>Letzte Aufnahme</h2>
+    <a href="/videos/<%= stats.latestRecording.id %>" class="recording-link">
+      <% if (stats.latestRecording.thumbnail_path) { %>
+        <img src="/thumbnails/<%= require('path').basename(stats.latestRecording.thumbnail_path) %>" alt="Thumbnail" class="thumb">
+      <% } %>
+      <span><%= stats.latestRecording.filename %></span>
+    </a>
+  </div>
+<% } %>

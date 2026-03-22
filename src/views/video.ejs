@@ -1,0 +1,25 @@
+<% title = 'Video'; pageCSS = 'archive'; %>
+<div class="video-detail">
+  <a href="/archive" class="btn btn--secondary btn--back">&larr; Zurück</a>
+  <h1 class="video-title"><%= recording.filename %></h1>
+  <video class="video-player" controls preload="metadata">
+    <source src="/videos/<%= recording.id %>/download" type="video/mp4">
+  </video>
+  <div class="video-meta">
+    <% if (recording.duration_seconds) { %><div>Dauer: <%= Math.round(recording.duration_seconds) %>s</div><% } %>
+    <% if (recording.width) { %><div>Auflösung: <%= recording.width %>×<%= recording.height %></div><% } %>
+    <% if (recording.file_size) { %><div>Größe: <%= (recording.file_size / 1024 / 1024).toFixed(1) %> MB</div><% } %>
+    <div>Aufgenommen: <%= new Date(recording.created_at).toLocaleString('de-DE') %></div>
+  </div>
+  <div class="video-actions">
+    <a href="/videos/<%= recording.id %>/download" download class="btn btn--primary">Herunterladen</a>
+    <button id="delete-btn" class="btn btn--danger" data-id="<%= recording.id %>">Löschen</button>
+  </div>
+</div>
+<script>
+  document.getElementById('delete-btn').addEventListener('click', async function() {
+    if (!confirm('Aufnahme wirklich löschen?')) return;
+    await fetch('/videos/' + this.dataset.id, { method: 'DELETE' });
+    window.location.href = '/archive';
+  });
+</script>
