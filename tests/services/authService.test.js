@@ -6,6 +6,11 @@ const authService = require('../../src/services/authService');
 
 beforeAll(() => { runMigrations(); });
 
+beforeEach(() => {
+  const db = getDb();
+  db.prepare('DELETE FROM users').run();
+});
+
 describe('authService', () => {
   test('createUser hashes password and stores user', async () => {
     await authService.createUser('admin', 'secret123');
