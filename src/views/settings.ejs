@@ -4,6 +4,7 @@
   <nav class="settings-nav">
     <a href="#erkennung" class="settings-nav__link">Erkennung</a>
     <a href="#aufnahme" class="settings-nav__link">Aufnahme</a>
+    <a href="#audio" class="settings-nav__link">Audio</a>
     <a href="#overlay" class="settings-nav__link">Overlay</a>
     <a href="#email" class="settings-nav__link">E-Mail</a>
     <a href="#test" class="settings-nav__link">Test</a>
@@ -128,7 +129,7 @@
     </section>
 
     <%# ── Aufnahme ──────────────────────────────────────── %>
-    <section class="settings-section settings-section--wide" id="aufnahme">
+    <section class="settings-section" id="aufnahme">
       <h2>Aufnahme</h2>
 
       <div class="settings-row" style="margin-bottom:1.25rem;">
@@ -195,37 +196,41 @@
         </div>
       </div>
 
-      <div class="settings-divider"></div>
+      <div class="field-group">
+        <label class="form-label">Kamera-Gerät
+          <input class="form-input" type="text" name="camera_device" value="<%= settings.camera_device %>">
+        </label>
+      </div>
+    </section>
 
-      <div class="field-row">
-        <div class="field-group">
-          <div class="settings-row" style="margin-bottom:0.75rem;">
-            <span class="settings-row__label">Audio aufnehmen</span>
-            <label class="toggle-row">
-              <span class="toggle">
-                <input type="checkbox" name="audio_enabled" value="true" <%= settings.audio_enabled === 'true' ? 'checked' : '' %>>
-                <span class="toggle-track"></span>
-              </span>
-            </label>
-          </div>
-          <label class="form-label">Audio-Bitrate
-            <select class="form-input" name="audio_bitrate">
-              <% [['64k','64 kbps'],['128k','128 kbps'],['192k','192 kbps'],['256k','256 kbps']].forEach(([v,l]) => { %>
-              <option value="<%= v %>" <%= settings.audio_bitrate === v ? 'selected' : '' %>><%= l %></option>
-              <% }) %>
-            </select>
-          </label>
-        </div>
-        <div class="field-group">
-          <label class="form-label">Kamera-Gerät
-            <input class="form-input" type="text" name="camera_device" value="<%= settings.camera_device %>">
-          </label>
-        </div>
-        <div class="field-group">
-          <label class="form-label">Audio-Gerät
-            <input class="form-input" type="text" name="audio_device" value="<%= settings.audio_device %>">
-          </label>
-        </div>
+    <%# ── Audio ─────────────────────────────────────────── %>
+    <section class="settings-section" id="audio">
+      <h2>Audio</h2>
+
+      <div class="settings-row">
+        <span class="settings-row__label">Audio aufnehmen</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="audio_enabled" value="true" <%= settings.audio_enabled === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+
+      <div class="field-group" style="margin-top:1rem;">
+        <label class="form-label">Audio-Bitrate
+          <select class="form-input" name="audio_bitrate">
+            <% [['64k','64 kbps'],['128k','128 kbps'],['192k','192 kbps'],['256k','256 kbps']].forEach(([v,l]) => { %>
+            <option value="<%= v %>" <%= settings.audio_bitrate === v ? 'selected' : '' %>><%= l %></option>
+            <% }) %>
+          </select>
+        </label>
+      </div>
+
+      <div class="field-group">
+        <label class="form-label">Audio-Gerät
+          <input class="form-input" type="text" name="audio_device" value="<%= settings.audio_device %>">
+        </label>
       </div>
     </section>
 
