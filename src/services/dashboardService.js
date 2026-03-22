@@ -1,7 +1,6 @@
 'use strict';
 const { getDb } = require('../db');
 const ffmpegService = require('./ffmpegService');
-const storageService = require('./storageService');
 
 function getStats() {
   const db = getDb();
@@ -16,10 +15,9 @@ function getStats() {
   const todayCount = db.prepare(
     "SELECT COUNT(*) as n FROM recordings WHERE date(created_at)=date('now')"
   ).get().n;
-  const diskUsage = storageService.getDiskUsage();
   const isRecording = ffmpegService.isRecording();
 
-  return { totalRecordings, latestRecording, totalDuration, todayCount, diskUsage, isRecording };
+  return { totalRecordings, latestRecording, totalDuration, todayCount, isRecording };
 }
 
 module.exports = { getStats };

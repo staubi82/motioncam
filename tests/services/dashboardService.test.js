@@ -26,7 +26,6 @@ describe('dashboardService.getStats', () => {
     expect(stats).toHaveProperty('totalRecordings');
     expect(stats).toHaveProperty('todayCount');
     expect(stats).toHaveProperty('totalDuration');
-    expect(stats).toHaveProperty('diskUsage');
     expect(stats).toHaveProperty('isRecording');
     expect(stats).toHaveProperty('latestRecording');
   });
