@@ -13,6 +13,11 @@
   </div>
   <div class="video-actions">
     <a href="/videos/<%= recording.id %>/download" download class="btn btn--primary">Herunterladen</a>
+    <button id="star-btn" class="btn btn--icon"
+      data-id="<%= recording.id %>"
+      data-favorite="<%= recording.is_favorite %>">
+      <%= recording.is_favorite ? '⭐' : '☆' %>
+    </button>
     <button id="delete-btn" class="btn btn--danger" data-id="<%= recording.id %>">Löschen</button>
   </div>
 </div>
@@ -21,5 +26,26 @@
     if (!confirm('Aufnahme wirklich löschen?')) return;
     await fetch('/videos/' + this.dataset.id, { method: 'DELETE' });
     window.location.href = '/archive';
+  });
+
+  document.getElementById('star-btn').addEventListener('click', async function() {
+    const id = this.dataset.id;
+    const current = this.dataset.favorite === '1';
+    const next = current ? 0 : 1;
+    try {
+      const res = await fetch(`/api/recordings/${id}/favorite`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_favorite: next }),
+      });
+      if (res.ok) {
+        this.dataset.favorite = String(next);
+        this.textContent = next === 1 ? '⭐' : '☆';
+      } else {
+        alert('Fehler beim Aktualisieren');
+      }
+    } catch {
+      alert('Fehler beim Aktualisieren');
+    }
   });
 </script>
