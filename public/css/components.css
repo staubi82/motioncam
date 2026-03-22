@@ -1,0 +1,22 @@
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border-radius: var(--radius); border: none; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: background 0.15s; }
+.btn--primary { background: var(--accent); color: #fff; }
+.btn--primary:hover { background: var(--accent-hover); color: #fff; }
+.btn--secondary { background: var(--border); color: var(--text); }
+.btn--secondary:hover { background: #2a2a3a; color: var(--text); }
+.btn--danger { background: var(--danger); color: #fff; }
+.btn--danger:hover { background: #dc2626; color: #fff; }
+.btn--sm { padding: 0.25rem 0.6rem; font-size: 0.8rem; }
+.btn--full { width: 100%; justify-content: center; }
+.btn--back { margin-bottom: 1.5rem; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge--success { background: rgba(34,197,94,0.15); color: var(--success); }
+.badge--danger { background: rgba(239,68,68,0.15); color: var(--danger); }
+.form-label { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; }
+.form-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.5rem 0.75rem; border-radius: var(--radius); font-size: 0.95rem; }
+.form-input:focus { outline: none; border-color: var(--accent); }
+.flash { padding: 0.75rem 1rem; border-radius: var(--radius); margin-bottom: 1.5rem; font-size: 0.9rem; }
+.flash--success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--success); }
+.flash--error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+.empty-state { color: var(--text-muted); text-align: center; padding: 3rem; }
+.error-page { text-align: center; padding: 4rem 1rem; }
+.error-page h1 { font-size: 4rem; color: var(--danger); margin-bottom: 1rem; }
