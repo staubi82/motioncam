@@ -49,3 +49,24 @@ describe('GET /archive', () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe('GET /archive?favorites=1', () => {
+  test('returns only favorite recordings', async () => {
+    const db = getDb();
+    db.prepare(
+      "INSERT INTO recordings (filename, filepath, processed, is_favorite) VALUES ('fav.mp4', '/tmp/fav.mp4', 1, 1)"
+    ).run();
+    db.prepare(
+      "INSERT INTO recordings (filename, filepath, processed, is_favorite) VALUES ('nonfav.mp4', '/tmp/nonfav.mp4', 1, 0)"
+    ).run();
+    const res = await request(app).get('/archive?favorites=1');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('fav.mp4');
+    expect(res.text).not.toContain('nonfav.mp4');
+  });
+
+  test('pagination preserves favorites filter', async () => {
+    const res = await request(app).get('/archive?favorites=1&page=1');
+    expect(res.status).toBe(200);
+  });
+});

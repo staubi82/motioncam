@@ -9,36 +9,42 @@ const mailService = require('./mailService');
 let _currentRecordingId = null;
 let _currentFilepath = null;
 let _stopTimer = null;
+let _maxDurationTimer = null;
 
 function reset() {
   _currentRecordingId = null;
   _currentFilepath = null;
   if (_stopTimer) { clearTimeout(_stopTimer); _stopTimer = null; }
+  if (_maxDurationTimer) { clearTimeout(_maxDurationTimer); _maxDurationTimer = null; }
 }
 
 function isStopScheduled() {
   return _stopTimer !== null;
 }
 
-async function startRecording() {
+async function startRecording(skipCooldown = false) {
   if (ffmpegService.isRecording()) return;
 
   const recordingEnabled = settingsService.getBool('recording_enabled');
   if (!recordingEnabled) return;
 
-  // Cooldown check
-  const cooldown = settingsService.getInt('event_cooldown_seconds');
   const db = getDb();
-  const lastEvent = db.prepare(
-    "SELECT occurred_at FROM events WHERE type='motion_start' ORDER BY id DESC LIMIT 1"
-  ).get();
-  if (lastEvent) {
-    const lastTime = new Date(lastEvent.occurred_at).getTime();
-    if (Date.now() - lastTime < cooldown * 1000) return;
+
+  // Cooldown check
+  if (!skipCooldown) {
+    const cooldown = settingsService.getInt('event_cooldown_seconds');
+    const lastEvent = db.prepare(
+      "SELECT occurred_at FROM events WHERE type='motion_start' ORDER BY id DESC LIMIT 1"
+    ).get();
+    if (lastEvent) {
+      const lastTime = new Date(lastEvent.occurred_at.replace(' ', 'T') + 'Z').getTime();
+      if (Date.now() - lastTime < cooldown * 1000) return;
+    }
   }
 
   const now = new Date();
-  const filename = now.toISOString().replace(/[:.]/g, '-').replace('T', '_').slice(0, 19) + '.mp4';
+  const pad = n => String(n).padStart(2, '0');
+  const filename = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}.mp4`;
   const storagePath = settingsService.get('storage_path');
   const filepath = path.join(storagePath, filename);
 
@@ -50,9 +56,28 @@ async function startRecording() {
     videoBitrate: settingsService.get('video_bitrate'),
     audioBitrate: settingsService.get('audio_bitrate'),
     audioEnabled: settingsService.getBool('audio_enabled'),
+    overlaySettings: {
+      overlay_enabled:         settingsService.get('overlay_enabled'),
+      overlay_show_datetime:   settingsService.get('overlay_show_datetime'),
+      overlay_show_resolution: settingsService.get('overlay_show_resolution'),
+      overlay_show_location:   settingsService.get('overlay_show_location'),
+      overlay_location_name:   settingsService.get('overlay_location_name'),
+      overlay_position:        settingsService.get('overlay_position'),
+      video_resolution:        settingsService.get('video_resolution'),
+    },
   };
 
   ffmpegService.spawn(filepath, opts);
+
+  // Max-clip-duration rotation
+  const maxDur = settingsService.getInt('max_clip_duration_seconds');
+  if (maxDur > 0) {
+    _maxDurationTimer = setTimeout(async () => {
+      _maxDurationTimer = null;
+      await _finishRecording();
+      await startRecording(true);
+    }, maxDur * 1000);
+  }
 
   // Log event
   const eventResult = db.prepare(
@@ -73,6 +98,7 @@ async function startRecording() {
 
 function scheduleStop() {
   if (_stopTimer) return;
+  if (_maxDurationTimer) { clearTimeout(_maxDurationTimer); _maxDurationTimer = null; }
   const nachlaufzeit = settingsService.getInt('recording_nachlaufzeit_seconds') || 30;
   _stopTimer = setTimeout(() => _finishRecording(), nachlaufzeit * 1000);
 }

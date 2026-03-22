@@ -50,6 +50,12 @@ function runMigrations() {
       error     TEXT
     );
   `);
+
+  // Idempotent: add is_favorite column if not present
+  const cols = db.prepare('PRAGMA table_info(recordings)').all();
+  if (!cols.some(c => c.name === 'is_favorite')) {
+    db.prepare('ALTER TABLE recordings ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0').run();
+  }
 }
 
 module.exports = { runMigrations };

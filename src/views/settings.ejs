@@ -1,49 +1,380 @@
 <% title = 'Einstellungen'; pageCSS = 'settings'; pageJS = 'settings'; %>
-<h1>Einstellungen</h1>
+<div class="settings-header">
+  <h1>Einstellungen</h1>
+  <nav class="settings-nav">
+    <a href="#erkennung" class="settings-nav__link">Erkennung</a>
+    <a href="#aufnahme" class="settings-nav__link">Aufnahme</a>
+    <a href="#audio" class="settings-nav__link">Audio</a>
+    <a href="#overlay" class="settings-nav__link">Overlay</a>
+    <a href="#email" class="settings-nav__link">E-Mail</a>
+    <a href="#test" class="settings-nav__link">Test</a>
+    <a href="#passwort" class="settings-nav__link">Passwort</a>
+  </nav>
+</div>
+
+<% if (flash) { %>
+<div class="alert alert--<%= flash.type %>"><%= flash.message %></div>
+<% } %>
+
 <form method="post" action="/settings" class="settings-form">
-  <section class="settings-section">
-    <h2>Erkennung</h2>
-    <label class="form-label"><input type="checkbox" name="detection_enabled" value="true" <%= settings.detection_enabled === 'true' ? 'checked' : '' %>> Bewegungserkennung aktiv</label>
-    <label class="form-label">Empfindlichkeit (1–100)<input class="form-input" type="number" name="detection_sensitivity" min="1" max="100" value="<%= settings.detection_sensitivity %>"></label>
-    <label class="form-label">Mindestfläche<input class="form-input" type="number" name="detection_min_area" value="<%= settings.detection_min_area %>"></label>
-    <label class="form-label">Event-Cooldown (s)<input class="form-input" type="number" name="event_cooldown_seconds" value="<%= settings.event_cooldown_seconds %>"></label>
-  </section>
-  <section class="settings-section">
-    <h2>Aufnahme</h2>
-    <label class="form-label"><input type="checkbox" name="recording_enabled" value="true" <%= settings.recording_enabled === 'true' ? 'checked' : '' %>> Automatisch aufnehmen</label>
-    <label class="form-label">Nachlaufzeit (s)<input class="form-input" type="number" name="recording_nachlaufzeit_seconds" value="<%= settings.recording_nachlaufzeit_seconds %>"></label>
-    <label class="form-label">FPS<input class="form-input" type="number" name="video_fps" value="<%= settings.video_fps %>"></label>
-    <label class="form-label">Auflösung<input class="form-input" type="text" name="video_resolution" value="<%= settings.video_resolution %>"></label>
-    <label class="form-label">Video-Bitrate<input class="form-input" type="text" name="video_bitrate" value="<%= settings.video_bitrate %>"></label>
-    <label class="form-label"><input type="checkbox" name="audio_enabled" value="true" <%= settings.audio_enabled === 'true' ? 'checked' : '' %>> Audio aufnehmen</label>
-    <label class="form-label">Audio-Bitrate<input class="form-input" type="text" name="audio_bitrate" value="<%= settings.audio_bitrate %>"></label>
-    <label class="form-label">Kamera-Gerät<input class="form-input" type="text" name="camera_device" value="<%= settings.camera_device %>"></label>
-    <label class="form-label">Audio-Gerät<input class="form-input" type="text" name="audio_device" value="<%= settings.audio_device %>"></label>
-  </section>
-  <section class="settings-section">
-    <h2>E-Mail</h2>
-    <label class="form-label"><input type="checkbox" name="mail_enabled" value="true" <%= settings.mail_enabled === 'true' ? 'checked' : '' %>> E-Mail-Benachrichtigungen</label>
-    <label class="form-label">Mail-Cooldown (s)<input class="form-input" type="number" name="mail_cooldown_seconds" value="<%= settings.mail_cooldown_seconds %>"></label>
-    <label class="form-label"><input type="checkbox" name="mail_snapshot_attach" value="true" <%= settings.mail_snapshot_attach === 'true' ? 'checked' : '' %>> Snapshot anhängen</label>
-    <label class="form-label">SMTP-Host<input class="form-input" type="text" name="smtp_host" value="<%= settings.smtp_host %>"></label>
-    <label class="form-label">SMTP-Port<input class="form-input" type="number" name="smtp_port" value="<%= settings.smtp_port %>"></label>
-    <label class="form-label">SMTP-User<input class="form-input" type="text" name="smtp_user" value="<%= settings.smtp_user %>"></label>
-    <label class="form-label">SMTP-Passwort<input class="form-input" type="password" name="smtp_pass" value="<%= settings.smtp_pass %>"></label>
-    <label class="form-label"><input type="checkbox" name="smtp_tls" value="true" <%= settings.smtp_tls === 'true' ? 'checked' : '' %>> TLS verwenden</label>
-    <label class="form-label">Absender<input class="form-input" type="email" name="smtp_from" value="<%= settings.smtp_from %>"></label>
-    <label class="form-label">Empfänger<input class="form-input" type="email" name="mail_recipient" value="<%= settings.mail_recipient %>"></label>
-    <button type="button" id="test-mail-btn" class="btn btn--secondary">Test-E-Mail senden</button>
-  </section>
-  <button type="submit" class="btn btn--primary">Speichern</button>
+  <div class="settings-grid">
+
+    <%# ── Erkennung ─────────────────────────────────────── %>
+    <section class="settings-section" id="erkennung">
+      <h2>Erkennung</h2>
+
+      <div class="settings-row">
+        <span class="settings-row__label">Bewegungserkennung</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="detection_enabled" value="true" <%= settings.detection_enabled === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+
+      <div class="field-group">
+        <label class="form-label">Empfindlichkeit
+          <div class="slider-wrapper">
+            <input type="range" name="detection_sensitivity" min="1" max="100" step="1" value="<%= settings.detection_sensitivity %>" data-unit="">
+            <span class="slider-value"><%= settings.detection_sensitivity %></span>
+          </div>
+        </label>
+        <p class="field-hint">Höher = mehr erkannt, aber mehr Fehlalarme.</p>
+      </div>
+
+      <div class="field-group">
+        <label class="form-label">Mindestfläche (px)
+          <div class="slider-wrapper">
+            <input type="range" name="detection_min_area" min="0" max="2000" step="50" value="<%= settings.detection_min_area %>" data-unit=" px">
+            <span class="slider-value"><%= settings.detection_min_area %> px</span>
+          </div>
+        </label>
+        <p class="field-hint">Kleinere Bewegungen (z.B. Insekten) werden ignoriert.</p>
+      </div>
+
+      <div class="field-group">
+        <label class="form-label">Event-Cooldown
+          <select class="form-input" name="event_cooldown_seconds">
+            <% [15,30,60,120,300].forEach(v => { %>
+            <option value="<%= v %>" <%= settings.event_cooldown_seconds == v ? 'selected' : '' %>><%= v %> Sekunden</option>
+            <% }) %>
+          </select>
+        </label>
+        <p class="field-hint">Mindestpause zwischen zwei Aufnahme-Ereignissen.</p>
+      </div>
+    </section>
+
+    <%# ── Video-Overlay ─────────────────────────────────── %>
+    <section class="settings-section" id="overlay">
+      <h2>Video-Overlay</h2>
+
+      <div class="settings-row">
+        <span class="settings-row__label">Overlay aktiv</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="overlay_enabled" value="true" <%= settings.overlay_enabled === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+      <p class="field-hint" style="margin-bottom:1rem;">Blendet Informationen ins Livebild und in Aufnahmen ein.</p>
+
+      <div class="field-group">
+        <p class="field-group__title">Anzeigen</p>
+        <div class="settings-row">
+          <span class="settings-row__label">Datum &amp; Uhrzeit</span>
+          <label class="toggle-row">
+            <span class="toggle">
+              <input type="checkbox" name="overlay_show_datetime" value="true" <%= settings.overlay_show_datetime === 'true' ? 'checked' : '' %>>
+              <span class="toggle-track"></span>
+            </span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row__label">Auflösung</span>
+          <label class="toggle-row">
+            <span class="toggle">
+              <input type="checkbox" name="overlay_show_resolution" value="true" <%= settings.overlay_show_resolution === 'true' ? 'checked' : '' %>>
+              <span class="toggle-track"></span>
+            </span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row__label">Ort / Raumname</span>
+          <label class="toggle-row">
+            <span class="toggle">
+              <input type="checkbox" name="overlay_show_location" value="true" <%= settings.overlay_show_location === 'true' ? 'checked' : '' %>>
+              <span class="toggle-track"></span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="form-label">Raumname
+          <input class="form-input" type="text" name="overlay_location_name" value="<%= settings.overlay_location_name %>" placeholder="z.B. Eingang">
+        </label>
+      </div>
+
+      <div class="field-group">
+        <p class="field-group__title">Position</p>
+        <input type="hidden" id="overlay_position" name="overlay_position" value="<%= settings.overlay_position || 'top-left' %>">
+        <div class="position-grid">
+          <% [['top-left','↖ Oben links'],['top-right','↗ Oben rechts'],['bottom-left','↙ Unten links'],['bottom-right','↘ Unten rechts']].forEach(([v,l]) => { %>
+          <div class="position-tile <%= (settings.overlay_position || 'top-left') === v ? 'active' : '' %>" data-position="<%= v %>"><%= l %></div>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+
+    <%# ── Aufnahme ──────────────────────────────────────── %>
+    <section class="settings-section" id="aufnahme">
+      <h2>Aufnahme</h2>
+
+      <div class="settings-row" style="margin-bottom:1.25rem;">
+        <span class="settings-row__label">Automatisch aufnehmen</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="recording_enabled" value="true" <%= settings.recording_enabled === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="form-label">Nachlaufzeit
+            <div class="slider-wrapper">
+              <input type="range" name="recording_nachlaufzeit_seconds" min="5" max="120" step="5" value="<%= settings.recording_nachlaufzeit_seconds %>" data-unit=" s">
+              <span class="slider-value"><%= settings.recording_nachlaufzeit_seconds %> s</span>
+            </div>
+          </label>
+          <p class="field-hint">Wie lange nach letzter Bewegung weiter aufgenommen wird.</p>
+        </div>
+        <div class="field-group">
+          <label class="form-label">Max. Clip-Länge
+            <select class="form-input" name="max_clip_duration_seconds">
+              <% [[0,'Unbegrenzt'],[30,'30 s'],[60,'60 s'],[120,'120 s'],[300,'300 s']].forEach(([v,l]) => { %>
+              <option value="<%= v %>" <%= settings.max_clip_duration_seconds == v ? 'selected' : '' %>><%= l %></option>
+              <% }) %>
+            </select>
+          </label>
+          <p class="field-hint">Bei Ablauf wird automatisch ein neuer Clip gestartet.</p>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="form-label">Auflösung
+            <select class="form-input" name="video_resolution">
+              <% [['640x480','640×480 (SD)'],['1280x720','1280×720 (HD)'],['1920x1080','1920×1080 (Full HD)']].forEach(([v,l]) => { %>
+              <option value="<%= v %>" <%= settings.video_resolution === v ? 'selected' : '' %>><%= l %></option>
+              <% }) %>
+            </select>
+          </label>
+          <p class="field-hint">Höhere Auflösung = besseres Bild, mehr Speicher.</p>
+        </div>
+        <div class="field-group">
+          <label class="form-label">Bildrate (FPS)
+            <select class="form-input" name="video_fps">
+              <% [5,10,15,20,25,30].forEach(v => { %>
+              <option value="<%= v %>" <%= settings.video_fps == v ? 'selected' : '' %>><%= v %> fps</option>
+              <% }) %>
+            </select>
+          </label>
+          <p class="field-hint">Mehr FPS = flüssiger, aber größere Dateien.</p>
+        </div>
+        <div class="field-group">
+          <label class="form-label">Video-Bitrate
+            <select class="form-input" name="video_bitrate">
+              <% [['500k','500 kbps'],['1000k','1000 kbps'],['2000k','2000 kbps'],['4000k','4000 kbps']].forEach(([v,l]) => { %>
+              <option value="<%= v %>" <%= settings.video_bitrate === v ? 'selected' : '' %>><%= l %></option>
+              <% }) %>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="form-label">Kamera-Gerät
+          <input class="form-input" type="text" name="camera_device" value="<%= settings.camera_device %>">
+        </label>
+      </div>
+    </section>
+
+    <%# ── Audio ─────────────────────────────────────────── %>
+    <section class="settings-section" id="audio">
+      <h2>Audio</h2>
+
+      <div class="settings-row">
+        <span class="settings-row__label">Audio aufnehmen</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="audio_enabled" value="true" <%= settings.audio_enabled === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+
+      <div class="field-group" style="margin-top:1rem;">
+        <label class="form-label">Audio-Bitrate
+          <select class="form-input" name="audio_bitrate">
+            <% [['64k','64 kbps'],['128k','128 kbps'],['192k','192 kbps'],['256k','256 kbps']].forEach(([v,l]) => { %>
+            <option value="<%= v %>" <%= settings.audio_bitrate === v ? 'selected' : '' %>><%= l %></option>
+            <% }) %>
+          </select>
+        </label>
+      </div>
+
+      <div class="field-group">
+        <label class="form-label">Audio-Gerät
+          <input class="form-input" type="text" name="audio_device" value="<%= settings.audio_device %>">
+        </label>
+      </div>
+    </section>
+
+    <%# ── E-Mail ─────────────────────────────────────────── %>
+    <section class="settings-section settings-section--wide" id="email">
+      <h2>E-Mail</h2>
+
+      <div class="settings-row">
+        <span class="settings-row__label">E-Mail-Benachrichtigungen</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="mail_enabled" value="true" <%= settings.mail_enabled === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row__label">Snapshot anhängen</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="mail_snapshot_attach" value="true" <%= settings.mail_snapshot_attach === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+      <div class="settings-row" style="margin-bottom:1.25rem;">
+        <span class="settings-row__label">TLS verwenden</span>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="smtp_tls" value="true" <%= settings.smtp_tls === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="field-row" style="margin-top:1rem;">
+        <div class="field-group">
+          <label class="form-label">Mail-Cooldown
+            <select class="form-input" name="mail_cooldown_seconds">
+              <% [[60,'1 Minute'],[120,'2 Minuten'],[300,'5 Minuten'],[600,'10 Minuten'],[1800,'30 Minuten']].forEach(([v,l]) => { %>
+              <option value="<%= v %>" <%= settings.mail_cooldown_seconds == v ? 'selected' : '' %>><%= l %></option>
+              <% }) %>
+            </select>
+          </label>
+          <p class="field-hint">Mindestpause zwischen zwei Benachrichtigungs-E-Mails.</p>
+        </div>
+        <div class="field-group">
+          <label class="form-label">SMTP-Host
+            <input class="form-input" type="text" name="smtp_host" value="<%= settings.smtp_host %>">
+          </label>
+        </div>
+        <div class="field-group">
+          <label class="form-label">SMTP-Port
+            <select class="form-input" name="smtp_port">
+              <% [25,465,587,2525].forEach(v => { %>
+              <option value="<%= v %>" <%= settings.smtp_port == v ? 'selected' : '' %>><%= v %></option>
+              <% }) %>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="form-label">SMTP-User
+            <input class="form-input" type="text" name="smtp_user" value="<%= settings.smtp_user %>">
+          </label>
+        </div>
+        <div class="field-group">
+          <label class="form-label">SMTP-Passwort
+            <input class="form-input" type="password" name="smtp_pass" value="<%= settings.smtp_pass %>">
+          </label>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="form-label">Absender
+            <input class="form-input" type="email" name="smtp_from" value="<%= settings.smtp_from %>">
+          </label>
+        </div>
+        <div class="field-group">
+          <label class="form-label">Empfänger
+            <input class="form-input" type="email" name="mail_recipient" value="<%= settings.mail_recipient %>">
+          </label>
+        </div>
+        <div class="field-group" style="display:flex;align-items:flex-end;">
+          <button type="button" id="test-mail-btn" class="btn btn--secondary">Test-E-Mail senden</button>
+        </div>
+      </div>
+    </section>
+
+  </div><%# /settings-grid %>
+
+  <div class="settings-save">
+    <button type="submit" class="btn btn--primary">Speichern</button>
+  </div>
 </form>
 
-<hr>
-<section class="settings-section">
-  <h2>Passwort ändern</h2>
-  <form method="post" action="/settings/password" class="settings-form">
-    <label class="form-label">Aktuelles Passwort<input class="form-input" type="password" name="current" required></label>
-    <label class="form-label">Neues Passwort<input class="form-input" type="password" name="newPass" required minlength="8"></label>
-    <label class="form-label">Wiederholen<input class="form-input" type="password" name="confirm" required></label>
-    <button type="submit" class="btn btn--primary">Passwort ändern</button>
-  </form>
-</section>
+<%# ── Test & Passwort ────────────────────────────────── %>
+<div class="settings-grid settings-grid--bottom">
+
+  <section class="settings-section" id="test">
+    <h2>Test</h2>
+    <% if (settings.smtp_host) { %>
+    <div class="settings-row" style="margin-bottom:1rem;">
+      <span class="settings-row__label">auch E-Mail senden</span>
+      <label class="toggle-row">
+        <span class="toggle">
+          <input type="checkbox" id="test-motion-mail">
+          <span class="toggle-track"></span>
+        </span>
+      </label>
+    </div>
+    <% } %>
+    <button type="button" id="test-motion-btn" class="btn btn--secondary">▶ Bewegung simulieren</button>
+    <p class="field-hint" style="margin-top:0.5rem;">Löst eine Testaufnahme aus (Dauer = Nachlaufzeit-Einstellung).</p>
+    <p id="test-motion-status" style="margin-top:0.5rem;font-size:0.85rem;"></p>
+  </section>
+
+  <section class="settings-section" id="passwort">
+    <h2>Passwort ändern</h2>
+    <form method="post" action="/settings/password" class="settings-form">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="form-label">Aktuelles Passwort
+            <input class="form-input" type="password" name="current" required>
+          </label>
+        </div>
+        <div class="field-group">
+          <label class="form-label">Neues Passwort
+            <input class="form-input" type="password" name="newPass" required minlength="8">
+          </label>
+        </div>
+        <div class="field-group">
+          <label class="form-label">Wiederholen
+            <input class="form-input" type="password" name="confirm" required>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn--primary">Passwort ändern</button>
+    </form>
+  </section>
+
+</div>

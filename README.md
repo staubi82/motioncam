@@ -15,10 +15,16 @@ sudo apt install ffmpeg motion nodejs npm
 ## Setup
 
 ```bash
+# Clone repo (as root on DietPi)
+git clone <repo-url> /root/motioncam
+cd /root/motioncam
+
+mkdir -p data public/uploads public/thumbnails
+
 cp .env.example .env
 # Edit .env with your settings
 
-npm install
+npm install --omit=dev
 
 # Create first admin user
 node scripts/create-admin.js
