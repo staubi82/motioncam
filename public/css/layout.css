@@ -1,16 +1,167 @@
-.site-header { background: var(--panel); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-.header-inner { max-width: 1200px; margin: 0 auto; padding: 0 1rem; display: flex; align-items: center; gap: 1rem; height: 56px; }
-.logo { font-size: 1.2rem; font-weight: 700; color: var(--text); }
-.main-nav { display: flex; gap: 0.5rem; margin-left: auto; align-items: center; }
-.nav-link { padding: 0.4rem 0.75rem; border-radius: var(--radius); color: var(--text-muted); font-size: 0.9rem; transition: color 0.15s, background 0.15s; }
-.nav-link:hover, .nav-link.active { color: var(--text); background: var(--border); }
-.nav-link--logout { color: var(--danger); }
-.nav-link--logout:hover { background: rgba(239,68,68,0.1); }
-.hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; margin-left: auto; }
-.main-content { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
-.site-footer { border-top: 1px solid var(--border); padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 4rem; }
+/* ── Header / Navbar ── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(22, 27, 34, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.logo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+}
+.logo-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.logo-icon svg { display: block; }
+.main-nav {
+  display: flex;
+  gap: 0.15rem;
+  margin-left: 1rem;
+  align-items: center;
+}
+.nav-link {
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.83rem;
+  transition: color 0.15s, background 0.15s;
+}
+.nav-link:hover { color: var(--text); background: var(--panel2); }
+.nav-link.active {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent);
+}
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+/* Status pill */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+.status-pill--idle {
+  background: rgba(63, 185, 80, 0.1);
+  border-color: rgba(63, 185, 80, 0.25);
+  color: var(--success);
+}
+.status-pill--recording {
+  background: rgba(248, 81, 73, 0.1);
+  border-color: rgba(248, 81, 73, 0.25);
+  color: var(--danger);
+}
+.status-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-pill--recording .status-pill__dot {
+  animation: pill-pulse 1.2s infinite;
+}
+@keyframes pill-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+/* Avatar */
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.avatar:hover { opacity: 0.85; }
+
+/* ── Main content ── */
+.main-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+}
+
+/* ── Footer ── */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-top: 3rem;
+}
+
+/* ── Mobile bottom nav ── */
+.mobile-nav { display: none; }
+
+/* ── Hamburger (kept for JS compat, hidden on desktop) ── */
+.hamburger { display: none; }
+
 @media (max-width: 640px) {
-  .hamburger { display: block; }
-  .main-nav { display: none; flex-direction: column; position: absolute; top: 56px; left: 0; right: 0; background: var(--panel); border-bottom: 1px solid var(--border); padding: 0.5rem; }
-  .main-nav.open { display: flex; }
+  .main-nav { display: none; }
+  .header-right .status-pill { display: none; }
+  .main-content { padding: 1rem 0.75rem 5rem; }
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 0 0.6rem;
+    z-index: 200;
+  }
+  .mobile-nav a {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.2rem 0;
+  }
+  .mobile-nav a.active { color: var(--accent); }
+  .mobile-nav svg { width: 20px; height: 20px; }
 }
