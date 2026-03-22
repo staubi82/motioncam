@@ -4,6 +4,7 @@ const fs = require('fs');
 const config = require('../config');
 const settingsService = require('../services/settingsService');
 const dashboardService = require('../services/dashboardService');
+const systemService = require('../services/systemService');
 
 function proxyStream(req, res, next) {
   const port = config.motionStreamPort;
@@ -35,4 +36,16 @@ function getDashboardStats(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { proxyStream, getSnapshot, getDashboardStats };
+async function getSystemStatus(req, res, next) {
+  try {
+    const [cpuPercent, diskInfo] = await Promise.all([
+      systemService.getCpuPercent(),
+      systemService.getDiskInfo(settingsService.get('storage_path') || '/'),
+    ]);
+    const { ramUsedMB, ramTotalMB } = systemService.getRamInfo();
+    const tempCelsius = systemService.getTempCelsius();
+    res.json({ cpuPercent, ramUsedMB, ramTotalMB, tempCelsius, ...diskInfo });
+  } catch (err) { next(err); }
+}
+
+module.exports = { proxyStream, getSnapshot, getDashboardStats, getSystemStatus };
