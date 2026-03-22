@@ -7,7 +7,7 @@ const execFileAsync = promisify(execFile);
 
 async function process(videoPath, thumbDir) {
   // Step 1: ffprobe
-  const stdout = await execFileAsync('ffprobe', [
+  const { stdout } = await execFileAsync('ffprobe', [
     '-v', 'quiet',
     '-print_format', 'json',
     '-show_streams',
