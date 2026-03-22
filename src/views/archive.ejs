@@ -11,7 +11,7 @@
       <div class="recording-card" data-id="<%= rec.id %>">
         <a href="/videos/<%= rec.id %>" class="recording-card__link">
           <% if (rec.thumbnail_path) { %>
-            <img src="/thumbnails/<%= require('path').basename(rec.thumbnail_path) %>" alt="" class="recording-card__thumb">
+            <img src="/thumbnails/<%= rec.thumbnail_path.split('/').pop() %>" alt="" class="recording-card__thumb">
           <% } else { %>
             <div class="recording-card__no-thumb">Kein Thumbnail</div>
           <% } %>

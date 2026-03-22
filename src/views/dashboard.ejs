@@ -30,7 +30,7 @@
     <h2>Letzte Aufnahme</h2>
     <a href="/videos/<%= stats.latestRecording.id %>" class="recording-link">
       <% if (stats.latestRecording.thumbnail_path) { %>
-        <img src="/thumbnails/<%= require('path').basename(stats.latestRecording.thumbnail_path) %>" alt="Thumbnail" class="thumb">
+        <img src="/thumbnails/<%= stats.latestRecording.thumbnail_path.split('/').pop() %>" alt="Thumbnail" class="thumb">
       <% } %>
       <span><%= stats.latestRecording.filename %></span>
     </a>
