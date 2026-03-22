@@ -29,6 +29,12 @@ const DEFAULTS = [
   ['smtp_tls', 'true'],
   ['smtp_from', ''],
   ['mail_recipient', ''],
+  ['overlay_enabled', 'false'],
+  ['overlay_show_datetime', 'true'],
+  ['overlay_show_resolution', 'true'],
+  ['overlay_show_location', 'true'],
+  ['overlay_location_name', ''],
+  ['overlay_position', 'top-left'],
 ];
 
 function runSeeds() {
