@@ -12,9 +12,9 @@
     <div class="stat-label">Gesamtdauer</div>
     <div class="stat-value"><%= Math.round(stats.totalDuration / 60) %> min</div>
   </div>
-  <div class="stat-card">
+  <div class="stat-card" id="stat-disk">
     <div class="stat-label">Speicher</div>
-    <div class="stat-value"><%= (stats.diskUsage / 1024 / 1024).toFixed(1) %> MB</div>
+    <div class="stat-value">…</div>
   </div>
   <div class="stat-card stat-card--status">
     <div class="stat-label">Status</div>
@@ -23,6 +23,18 @@
         <%= stats.isRecording ? 'Aufnahme läuft' : 'Bereit' %>
       </span>
     </div>
+  </div>
+  <div class="stat-card" id="stat-cpu">
+    <div class="stat-label">CPU</div>
+    <div class="stat-value">…</div>
+  </div>
+  <div class="stat-card" id="stat-ram">
+    <div class="stat-label">RAM</div>
+    <div class="stat-value">…</div>
+  </div>
+  <div class="stat-card" id="stat-temp">
+    <div class="stat-label">Temperatur</div>
+    <div class="stat-value">…</div>
   </div>
 </div>
 <% if (stats.latestRecording) { %>
