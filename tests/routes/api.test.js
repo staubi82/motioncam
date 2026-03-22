@@ -23,7 +23,7 @@ beforeAll(() => {
   settingsService.loadAll();
   dashboardService.getStats.mockReturnValue({
     totalRecordings: 5, todayCount: 2, totalDuration: 120,
-    isRecording: false, latestRecording: null, favoriteRecordings: [],
+    isRecording: false, latestRecordings: [], favoriteRecordings: [],
   });
   systemService.getCpuPercent.mockResolvedValue(42);
   systemService.getRamInfo.mockReturnValue({ ramUsedMB: 512, ramTotalMB: 1024 });

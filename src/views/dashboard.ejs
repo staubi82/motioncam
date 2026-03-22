@@ -56,14 +56,20 @@
     </div>
   </div>
 <% } %>
-<% if (stats.latestRecording) { %>
+<% if (stats.latestRecordings && stats.latestRecordings.length > 0) { %>
   <div class="latest-recording">
-    <h2>Letzte Aufnahme</h2>
-    <a href="/videos/<%= stats.latestRecording.id %>" class="recording-link">
-      <% if (stats.latestRecording.thumbnail_path) { %>
-        <img src="/thumbnails/<%= stats.latestRecording.thumbnail_path.split('/').pop() %>" alt="Thumbnail" class="thumb">
+    <h2>Letzte Aufnahmen</h2>
+    <div class="fav-grid">
+      <% for (const rec of stats.latestRecordings) { %>
+        <a href="/videos/<%= rec.id %>" class="fav-thumb">
+          <% if (rec.thumbnail_path) { %>
+            <img src="/thumbnails/<%= rec.thumbnail_path.split('/').pop() %>" alt="">
+          <% } else { %>
+            <span class="fav-thumb__empty">▶</span>
+          <% } %>
+          <span class="fav-thumb__date"><%= new Date(rec.created_at).toLocaleString('de-DE', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) %></span>
+        </a>
       <% } %>
-      <span><%= stats.latestRecording.filename %></span>
-    </a>
+    </div>
   </div>
 <% } %>

@@ -10,7 +10,8 @@
 .favorites-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
 .favorites-header h2 { font-size: 1.1rem; margin: 0; }
 .fav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
-.fav-thumb { display: block; aspect-ratio: 16/9; overflow: hidden; border-radius: var(--radius); background: var(--border); }
+.fav-thumb { display: block; position: relative; aspect-ratio: 16/9; overflow: hidden; border-radius: var(--radius); background: var(--border); }
 .fav-thumb img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.15s; }
 .fav-thumb:hover img { opacity: 0.8; }
 .fav-thumb__empty { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--text-muted); font-size: 1.2rem; }
+.fav-thumb__date { position: absolute; bottom: 0; left: 0; right: 0; padding: 0.2rem 0.4rem; background: rgba(0,0,0,0.55); color: #fff; font-size: 0.65rem; text-align: center; }

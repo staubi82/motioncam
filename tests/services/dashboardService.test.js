@@ -37,7 +37,7 @@ describe('dashboardService.getStats', () => {
     expect(stats).toHaveProperty('todayCount');
     expect(stats).toHaveProperty('totalDuration');
     expect(stats).toHaveProperty('isRecording');
-    expect(stats).toHaveProperty('latestRecording');
+    expect(stats).toHaveProperty('latestRecordings');
   });
 
   test('totalRecordings is 0 for empty DB', () => {

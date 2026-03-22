@@ -6,9 +6,9 @@ function getStats() {
   const db = getDb();
 
   const totalRecordings = db.prepare('SELECT COUNT(*) as n FROM recordings WHERE processed=1').get().n;
-  const latestRecording = db.prepare(
-    'SELECT * FROM recordings WHERE processed=1 ORDER BY created_at DESC LIMIT 1'
-  ).get() || null;
+  const latestRecordings = db.prepare(
+    'SELECT * FROM recordings WHERE processed=1 ORDER BY created_at DESC LIMIT 8'
+  ).all();
   const totalDuration = db.prepare(
     'SELECT SUM(duration_seconds) as s FROM recordings WHERE processed=1'
   ).get().s || 0;
@@ -20,7 +20,7 @@ function getStats() {
     'SELECT * FROM recordings WHERE processed=1 AND is_favorite=1 ORDER BY created_at DESC LIMIT 6'
   ).all();
 
-  return { totalRecordings, latestRecording, totalDuration, todayCount, isRecording, favoriteRecordings };
+  return { totalRecordings, latestRecordings, totalDuration, todayCount, isRecording, favoriteRecordings };
 }
 
 module.exports = { getStats };
