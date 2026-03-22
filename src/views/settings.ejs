@@ -10,8 +10,11 @@
   <%# ── Erkennung ─────────────────────────────────────── %>
   <section class="settings-section">
     <h2>Erkennung</h2>
-    <label class="form-label">
-      <input type="checkbox" name="detection_enabled" value="true" <%= settings.detection_enabled === 'true' ? 'checked' : '' %>>
+    <label class="toggle-row">
+      <span class="toggle">
+        <input type="checkbox" name="detection_enabled" value="true" <%= settings.detection_enabled === 'true' ? 'checked' : '' %>>
+        <span class="toggle-track"></span>
+      </span>
       Bewegungserkennung aktiv
     </label>
 
@@ -51,8 +54,11 @@
   <%# ── Aufnahme ──────────────────────────────────────── %>
   <section class="settings-section">
     <h2>Aufnahme</h2>
-    <label class="form-label">
-      <input type="checkbox" name="recording_enabled" value="true" <%= settings.recording_enabled === 'true' ? 'checked' : '' %>>
+    <label class="toggle-row">
+      <span class="toggle">
+        <input type="checkbox" name="recording_enabled" value="true" <%= settings.recording_enabled === 'true' ? 'checked' : '' %>>
+        <span class="toggle-track"></span>
+      </span>
       Automatisch aufnehmen
     </label>
 
@@ -111,8 +117,11 @@
         </label>
       </div>
       <div>
-        <label class="form-label">
-          <input type="checkbox" name="audio_enabled" value="true" <%= settings.audio_enabled === 'true' ? 'checked' : '' %>>
+        <label class="toggle-row">
+          <span class="toggle">
+            <input type="checkbox" name="audio_enabled" value="true" <%= settings.audio_enabled === 'true' ? 'checked' : '' %>>
+            <span class="toggle-track"></span>
+          </span>
           Audio aufnehmen
         </label>
       </div>
@@ -141,17 +150,38 @@
   <%# ── Video-Overlay ─────────────────────────────────── %>
   <section class="settings-section">
     <h2>Video-Overlay</h2>
-    <label class="form-label">
-      <input type="checkbox" name="overlay_enabled" value="true" <%= settings.overlay_enabled === 'true' ? 'checked' : '' %>>
+    <label class="toggle-row">
+      <span class="toggle">
+        <input type="checkbox" name="overlay_enabled" value="true" <%= settings.overlay_enabled === 'true' ? 'checked' : '' %>>
+        <span class="toggle-track"></span>
+      </span>
       Overlay aktiv
     </label>
     <p class="field-hint">Blendet Informationen ins Livebild und in Aufnahmen ein.</p>
 
     <div style="margin-top:1rem;">
       <p class="form-label" style="margin-bottom:0.5rem;">Anzeigen</p>
-      <label class="form-label"><input type="checkbox" name="overlay_show_datetime" value="true" <%= settings.overlay_show_datetime === 'true' ? 'checked' : '' %>> Datum & Uhrzeit</label>
-      <label class="form-label"><input type="checkbox" name="overlay_show_resolution" value="true" <%= settings.overlay_show_resolution === 'true' ? 'checked' : '' %>> Auflösung</label>
-      <label class="form-label"><input type="checkbox" name="overlay_show_location" value="true" <%= settings.overlay_show_location === 'true' ? 'checked' : '' %>> Ort / Raumname</label>
+      <label class="toggle-row" style="margin-bottom:0.75rem;">
+        <span class="toggle">
+          <input type="checkbox" name="overlay_show_datetime" value="true" <%= settings.overlay_show_datetime === 'true' ? 'checked' : '' %>>
+          <span class="toggle-track"></span>
+        </span>
+        Datum &amp; Uhrzeit
+      </label>
+      <label class="toggle-row" style="margin-bottom:0.75rem;">
+        <span class="toggle">
+          <input type="checkbox" name="overlay_show_resolution" value="true" <%= settings.overlay_show_resolution === 'true' ? 'checked' : '' %>>
+          <span class="toggle-track"></span>
+        </span>
+        Auflösung
+      </label>
+      <label class="toggle-row">
+        <span class="toggle">
+          <input type="checkbox" name="overlay_show_location" value="true" <%= settings.overlay_show_location === 'true' ? 'checked' : '' %>>
+          <span class="toggle-track"></span>
+        </span>
+        Ort / Raumname
+      </label>
     </div>
 
     <div style="margin-top:1rem;">
@@ -172,8 +202,11 @@
   <%# ── E-Mail ─────────────────────────────────────────── %>
   <section class="settings-section">
     <h2>E-Mail</h2>
-    <label class="form-label">
-      <input type="checkbox" name="mail_enabled" value="true" <%= settings.mail_enabled === 'true' ? 'checked' : '' %>>
+    <label class="toggle-row">
+      <span class="toggle">
+        <input type="checkbox" name="mail_enabled" value="true" <%= settings.mail_enabled === 'true' ? 'checked' : '' %>>
+        <span class="toggle-track"></span>
+      </span>
       E-Mail-Benachrichtigungen
     </label>
 
@@ -188,8 +221,11 @@
       <p class="field-hint">Mindestpause zwischen zwei Benachrichtigungs-E-Mails.</p>
     </div>
 
-    <label class="form-label" style="margin-top:1rem;">
-      <input type="checkbox" name="mail_snapshot_attach" value="true" <%= settings.mail_snapshot_attach === 'true' ? 'checked' : '' %>>
+    <label class="toggle-row" style="margin-top:1rem;">
+      <span class="toggle">
+        <input type="checkbox" name="mail_snapshot_attach" value="true" <%= settings.mail_snapshot_attach === 'true' ? 'checked' : '' %>>
+        <span class="toggle-track"></span>
+      </span>
       Snapshot anhängen
     </label>
 
@@ -209,8 +245,11 @@
       <label class="form-label">SMTP-Passwort<input class="form-input" type="password" name="smtp_pass" value="<%= settings.smtp_pass %>"></label>
     </div>
 
-    <label class="form-label" style="margin-top:1rem;">
-      <input type="checkbox" name="smtp_tls" value="true" <%= settings.smtp_tls === 'true' ? 'checked' : '' %>>
+    <label class="toggle-row" style="margin-top:1rem;">
+      <span class="toggle">
+        <input type="checkbox" name="smtp_tls" value="true" <%= settings.smtp_tls === 'true' ? 'checked' : '' %>>
+        <span class="toggle-track"></span>
+      </span>
       TLS verwenden
     </label>
 
@@ -229,8 +268,12 @@
 <section class="settings-section" style="margin-top:1.5rem;max-width:960px;">
   <h2>Test</h2>
   <% if (settings.smtp_host) { %>
-  <label class="form-label" style="margin-bottom:1rem;">
-    <input type="checkbox" id="test-motion-mail"> auch E-Mail senden
+  <label class="toggle-row" style="margin-bottom:1rem;">
+    <span class="toggle">
+      <input type="checkbox" id="test-motion-mail">
+      <span class="toggle-track"></span>
+    </span>
+    auch E-Mail senden
   </label>
   <% } %>
   <button type="button" id="test-motion-btn" class="btn btn--secondary">▶ Bewegung simulieren</button>
