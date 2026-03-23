@@ -56,6 +56,9 @@ function runMigrations() {
   if (!cols.some(c => c.name === 'is_favorite')) {
     db.prepare('ALTER TABLE recordings ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0').run();
   }
+
+  // Idempotent: add detection_min_frames setting if not present
+  db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('detection_min_frames', '2')").run();
 }
 
 module.exports = { runMigrations };

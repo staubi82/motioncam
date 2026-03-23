@@ -34,23 +34,23 @@
       </div>
 
       <div class="field-group">
-        <label class="form-label">Empfindlichkeit
-          <div class="slider-wrapper">
-            <input type="range" name="detection_sensitivity" min="1" max="100" step="1" value="<%= settings.detection_sensitivity %>" data-unit="">
-            <span class="slider-value"><%= settings.detection_sensitivity %></span>
-          </div>
-        </label>
-        <p class="field-hint">Höher = mehr erkannt, aber mehr Fehlalarme.</p>
-      </div>
-
-      <div class="field-group">
         <label class="form-label">Mindestfläche (px)
           <div class="slider-wrapper">
             <input type="range" name="detection_min_area" min="0" max="2000" step="50" value="<%= settings.detection_min_area %>" data-unit=" px">
             <span class="slider-value"><%= settings.detection_min_area %> px</span>
           </div>
         </label>
-        <p class="field-hint">Kleinere Bewegungen (z.B. Insekten) werden ignoriert.</p>
+        <p class="field-hint">Wie viele Pixel sich ändern müssen, um Bewegung auszulösen. Niedriger = empfindlicher.</p>
+      </div>
+
+      <div class="field-group">
+        <label class="form-label">Mindest-Frames
+          <div class="slider-wrapper">
+            <input type="range" name="detection_min_frames" min="1" max="10" step="1" value="<%= settings.detection_min_frames %>" data-unit=" Frames">
+            <span class="slider-value"><%= settings.detection_min_frames %> Frames</span>
+          </div>
+        </label>
+        <p class="field-hint">Wie viele aufeinanderfolgende Frames Bewegung enthalten müssen. Höher = weniger Fehlalarme.</p>
       </div>
 
       <div class="field-group">

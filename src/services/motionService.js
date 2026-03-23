@@ -5,8 +5,8 @@ const config = require('../config');
 const settingsService = require('./settingsService');
 
 const CONF_MAP = {
-  detection_sensitivity: 'threshold',
-  detection_min_area: 'minimum_motion_frames',
+  detection_min_area: 'threshold',
+  detection_min_frames: 'minimum_motion_frames',
 };
 
 function _rewriteConf(confPath) {
