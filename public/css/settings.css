@@ -61,6 +61,15 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.settings-section::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.7), transparent);
 }
 .settings-section h2 {
   font-size: 0.78rem;
