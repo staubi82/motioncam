@@ -40,6 +40,7 @@ function createApp() {
   app.use('/archive', require('./routes/archive'));
   app.use('/videos', require('./routes/videos'));
   app.use('/settings', require('./routes/settings'));
+  app.use('/log', require('./routes/log'));
   app.use('/api/hooks', require('./routes/hooks'));
   app.use('/api', require('./routes/api'));
 

@@ -81,8 +81,11 @@ async function startRecording(skipCooldown = false) {
 
   // Log event
   const eventResult = db.prepare(
-    "INSERT INTO events (type) VALUES ('motion_start')"
-  ).run();
+    "INSERT INTO events (type, meta) VALUES ('motion_start', ?)"
+  ).run(JSON.stringify({
+    threshold: settingsService.get('detection_min_area'),
+    min_frames: settingsService.get('detection_min_frames'),
+  }));
 
   // Create recording record
   const recResult = db.prepare(
@@ -126,7 +129,9 @@ async function _finishRecording() {
     console.error('Post-processing failed:', err.message);
   }
 
-  db.prepare("INSERT INTO events (type) VALUES ('recording_complete')").run();
+  db.prepare("INSERT INTO events (type, meta) VALUES ('recording_complete', ?)").run(
+    JSON.stringify({ recording_id: _currentRecordingId })
+  );
   _currentRecordingId = null;
   _currentFilepath = null;
 }

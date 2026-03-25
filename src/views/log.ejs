@@ -1,0 +1,36 @@
+<% title = 'Log'; pageCSS = 'log'; pageJS = 'log'; %>
+
+<div class="log-header">
+  <h1>Systemlog</h1>
+  <div class="log-header__actions">
+    <div class="log-filter" role="group">
+      <a href="/log?filter=all"    class="log-filter__btn <%= filter === 'all'    ? 'active' : '' %>">Alle</a>
+      <a href="/log?filter=motion" class="log-filter__btn <%= filter === 'motion' ? 'active' : '' %>">Bewegung</a>
+      <a href="/log?filter=mail"   class="log-filter__btn <%= filter === 'mail'   ? 'active' : '' %>">E-Mail</a>
+    </div>
+    <div class="log-live">
+      <span class="live-dot" id="live-dot"></span>
+      <span class="live-label">Live</span>
+    </div>
+  </div>
+</div>
+
+<div class="log-wrap" id="log-wrap">
+<% if (entries.length === 0) { %>
+  <p class="empty-state">Keine Einträge vorhanden.</p>
+<% } else { %>
+  <div class="log-list" id="log-list">
+    <% for (const entry of entries) { %>
+      <%- include('../partials/log-entry', { entry }) %>
+    <% } %>
+  </div>
+
+  <% if (page > 1 || hasMore) { %>
+  <div class="pagination">
+    <% if (page > 1) { %><a href="/log?filter=<%= filter %>&page=<%= page - 1 %>" class="btn btn--secondary">Zurück</a><% } %>
+    <span>Seite <%= page %></span>
+    <% if (hasMore) { %><a href="/log?filter=<%= filter %>&page=<%= page + 1 %>" class="btn btn--secondary">Weiter</a><% } %>
+  </div>
+  <% } %>
+<% } %>
+</div>

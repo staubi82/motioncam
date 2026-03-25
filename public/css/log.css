@@ -1,0 +1,161 @@
+/* ── Log header ───────────────────────────────────────────── */
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.log-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Filter tabs */
+.log-filter {
+  display: flex;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.2rem;
+  gap: 0.15rem;
+}
+.log-filter__btn {
+  padding: 0.25rem 0.8rem;
+  border-radius: calc(var(--radius) - 2px);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.log-filter__btn:hover { background: var(--border); color: var(--text); }
+.log-filter__btn.active { background: var(--accent); color: #fff; }
+
+/* Live indicator */
+.log-live {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: background 0.3s;
+}
+.live-dot.active {
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+  animation: live-pulse 2s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Log list ─────────────────────────────────────────────── */
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* ── Log entry ────────────────────────────────────────────── */
+.log-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+/* Left color bar */
+.log-entry::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+}
+.log-entry--warning::after  { background: var(--warning); }
+.log-entry--success::after  { background: var(--success); }
+.log-entry--danger::after   { background: var(--danger); }
+.log-entry--info::after     { background: var(--accent); }
+.log-entry--default::after  { background: var(--border); }
+
+.log-entry__icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.log-entry__icon svg { width: 16px; height: 16px; }
+
+.log-entry--warning .log-entry__icon { background: rgba(210,153,34,0.12); color: var(--warning); }
+.log-entry--success .log-entry__icon { background: rgba(63,185,80,0.12);  color: var(--success); }
+.log-entry--danger  .log-entry__icon { background: rgba(248,81,73,0.12);  color: var(--danger);  }
+.log-entry--info    .log-entry__icon { background: rgba(59,130,246,0.12); color: var(--accent);  }
+.log-entry--default .log-entry__icon { background: var(--panel2);         color: var(--text-muted); }
+
+.log-entry__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.log-entry__label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.log-entry__detail {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.log-link {
+  color: var(--accent);
+  font-size: 0.78rem;
+}
+.log-link:hover { color: var(--accent-hover); }
+
+.log-entry__time {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+.log-entry__date  { font-size: 0.72rem; color: var(--text-muted); }
+.log-entry__clock { font-size: 0.82rem; color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* New entry animation */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.log-entry--new { animation: slide-in 0.3s ease both; }
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}

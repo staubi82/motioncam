@@ -1,0 +1,56 @@
+<%
+  let icon, label, colorClass, detail = '';
+
+  if (entry.source === 'event') {
+    const meta = (() => { try { return JSON.parse(entry.meta || '{}'); } catch { return {}; } })();
+
+    if (entry.type === 'motion_start') {
+      icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>';
+      label = 'Bewegung erkannt';
+      colorClass = 'log-entry--warning';
+      if (meta.threshold) detail = `Schwelle: ${meta.threshold} px · Min. Frames: ${meta.min_frames || '–'}`;
+    } else if (entry.type === 'recording_complete') {
+      icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+      label = 'Aufnahme abgeschlossen';
+      colorClass = 'log-entry--success';
+      if (entry.duration_seconds) {
+        const dur = Math.round(entry.duration_seconds);
+        const size = entry.file_size ? (entry.file_size / 1024 / 1024).toFixed(1) + ' MB' : '';
+        detail = `${dur}s` + (size ? ` · ${size}` : '');
+      }
+      if (entry.rec_id) detail += (detail ? ' · ' : '') + `<a href="/videos/${entry.rec_id}" class="log-link">Video ansehen</a>`;
+    } else {
+      icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+      label = entry.type;
+      colorClass = 'log-entry--default';
+    }
+  } else {
+    // notification
+    if (entry.status === 'sent') {
+      icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+      label = 'E-Mail gesendet';
+      colorClass = 'log-entry--info';
+      detail = entry.recipient || '';
+    } else {
+      icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+      label = 'E-Mail fehlgeschlagen';
+      colorClass = 'log-entry--danger';
+      detail = entry.error || entry.recipient || '';
+    }
+  }
+
+  const ts = new Date(entry.ts.replace(' ', 'T') + 'Z');
+  const dateStr = ts.toLocaleDateString('de-DE');
+  const timeStr = ts.toLocaleTimeString('de-DE');
+%>
+<div class="log-entry <%= colorClass %>">
+  <div class="log-entry__icon"><%- icon %></div>
+  <div class="log-entry__body">
+    <span class="log-entry__label"><%- label %></span>
+    <% if (detail) { %><span class="log-entry__detail"><%- detail %></span><% } %>
+  </div>
+  <div class="log-entry__time" title="<%= dateStr %> <%= timeStr %>">
+    <span class="log-entry__date"><%= dateStr %></span>
+    <span class="log-entry__clock"><%= timeStr %></span>
+  </div>
+</div>
