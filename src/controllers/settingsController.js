@@ -7,7 +7,7 @@ const ffmpegService = require('../services/ffmpegService');
 const recordingService = require('../services/recordingService');
 
 const EDITABLE_KEYS = [
-  'detection_enabled', 'detection_sensitivity', 'detection_min_area', 'event_cooldown_seconds',
+  'detection_enabled', 'detection_sensitivity', 'detection_min_area', 'detection_min_frames', 'event_cooldown_seconds',
   'recording_enabled', 'recording_nachlaufzeit_seconds', 'max_clip_duration_seconds', 'video_fps', 'video_resolution',
   'video_bitrate', 'audio_enabled', 'audio_bitrate', 'storage_path', 'thumbnail_path',
   'snapshot_path', 'camera_device', 'audio_device',
@@ -38,7 +38,7 @@ function saveSettings(req, res, next) {
     }
     settingsService.setMany(update);
     // Apply detection settings to motion daemon (non-blocking)
-    const detectionKeys = ['detection_enabled', 'detection_sensitivity', 'detection_min_area'];
+    const detectionKeys = ['detection_enabled', 'detection_sensitivity', 'detection_min_area', 'detection_min_frames'];
     if (detectionKeys.some(k => k in update)) motionService.applyDetectionSettings().catch(console.error);
     req.session.flash = { type: 'success', message: 'Einstellungen gespeichert.' };
     res.redirect('/settings');
