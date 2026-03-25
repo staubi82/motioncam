@@ -15,7 +15,35 @@
   --shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; font-size: 16px; line-height: 1.5; min-height: 100vh; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(59,130,246,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
 a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-hover); }
 img { max-width: 100%; display: block; }

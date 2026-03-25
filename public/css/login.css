@@ -11,6 +11,10 @@
   background: #080c10;
 }
 
+/* Override base grid — login has its own bg-grid div */
+.login-body::before,
+.login-body::after { display: none; }
+
 /* Background grid */
 .bg-grid {
   position: fixed;
