@@ -33,30 +33,7 @@
   z-index: 1;
 }
 
-/* Scanline effect */
-.scanline {
-  position: fixed;
-  top: -10%;
-  left: 0;
-  right: 0;
-  height: 120px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(59,130,246,0.03) 40%,
-    rgba(59,130,246,0.07) 50%,
-    rgba(59,130,246,0.03) 60%,
-    transparent 100%
-  );
-  animation: scan 6s linear infinite;
-  pointer-events: none;
-  z-index: 2;
-}
-
-@keyframes scan {
-  0%   { top: -10%; }
-  100% { top: 110%; }
-}
+.scanline { display: none; }
 
 /* Wrap */
 .login-wrap {
@@ -297,4 +274,13 @@
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--success); }
   50%       { opacity: 0.5; box-shadow: 0 0 2px var(--success); }
+}
+
+.login-by {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  color: rgba(125, 133, 144, 0.35);
+  letter-spacing: 0.05em;
 }
