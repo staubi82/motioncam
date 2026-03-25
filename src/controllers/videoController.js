@@ -2,6 +2,16 @@
 const { getDb } = require('../db');
 const storageService = require('../services/storageService');
 
+function bulkDeleteVideos(req, res, next) {
+  try {
+    const ids = req.body.ids;
+    if (!Array.isArray(ids) || ids.length === 0)
+      return res.status(400).json({ ok: false, message: 'Keine IDs angegeben' });
+    storageService.deleteRecordings(ids.map(Number));
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+}
+
 function showVideo(req, res, next) {
   try {
     const db = getDb();
@@ -27,4 +37,4 @@ function downloadVideo(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { showVideo, deleteVideo, downloadVideo };
+module.exports = { showVideo, deleteVideo, downloadVideo, bulkDeleteVideos };

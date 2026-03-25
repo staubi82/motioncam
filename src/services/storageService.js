@@ -25,4 +25,12 @@ function deleteRecording(id) {
   db.prepare('DELETE FROM recordings WHERE id=?').run(id);
 }
 
-module.exports = { getDiskUsage, deleteRecording };
+function deleteRecordings(ids) {
+  const db = getDb();
+  const del = db.transaction((list) => {
+    for (const id of list) deleteRecording(id);
+  });
+  del(ids);
+}
+
+module.exports = { getDiskUsage, deleteRecording, deleteRecordings };
