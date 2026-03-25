@@ -92,8 +92,11 @@ async function startRecording(skipCooldown = false) {
   _currentRecordingId = recResult.lastInsertRowid;
   _currentFilepath = filepath;
 
-  // Mail notification (non-blocking)
-  mailService.notifyIfEnabled().catch(() => {});
+  // Mail notification: wait 5s so the motion daemon can write a snapshot
+  const snapshotPath = settingsService.get('snapshot_path');
+  setTimeout(() => {
+    mailService.notifyIfEnabled(snapshotPath || null).catch(() => {});
+  }, 5000);
 }
 
 function scheduleStop() {

@@ -1,4 +1,5 @@
 'use strict';
+const fs = require('fs');
 const nodemailer = require('nodemailer');
 const { getDb } = require('../db');
 const config = require('../config');
@@ -22,13 +23,14 @@ function _createTransport() {
   });
 }
 
-async function _send(subject, html) {
+async function _send(subject, html, attachments = []) {
   const transport = _createTransport();
   const info = await transport.sendMail({
     from: settingsService.get('smtp_from'),
     to: settingsService.get('mail_recipient'),
     subject,
     html,
+    attachments,
   });
 
   const db = getDb();
@@ -39,7 +41,7 @@ async function _send(subject, html) {
   return info;
 }
 
-async function notifyIfEnabled() {
+async function notifyIfEnabled(snapshotPath = null) {
   if (!settingsService.getBool('mail_enabled')) return;
 
   const cooldown = settingsService.getInt('mail_cooldown_seconds') * 1000;
@@ -47,11 +49,26 @@ async function notifyIfEnabled() {
 
   const now = new Date();
   const subject = `[MotionCam] Bewegung erkannt – ${now.toLocaleDateString('de-DE')} ${now.toLocaleTimeString('de-DE')}`;
-  const html = `<p>Bewegung erkannt um ${now.toLocaleString('de-DE')}</p>
-                <p><a href="${config.appBaseUrl}">Archiv öffnen</a></p>`;
+
+  const attachSnapshot = settingsService.getBool('mail_snapshot_attach')
+    && snapshotPath
+    && fs.existsSync(snapshotPath);
+
+  const snapshotHtml = attachSnapshot
+    ? `<br><img src="cid:snapshot" style="max-width:100%;border-radius:6px;" alt="Snapshot">`
+    : '';
+
+  const html = `
+    <p>Bewegung erkannt um <strong>${now.toLocaleString('de-DE')}</strong></p>
+    ${snapshotHtml}
+    <p><a href="${config.appBaseUrl}">Archiv öffnen</a></p>`;
+
+  const attachments = attachSnapshot
+    ? [{ filename: 'snapshot.jpg', path: snapshotPath, cid: 'snapshot' }]
+    : [];
 
   try {
-    await _send(subject, html);
+    await _send(subject, html, attachments);
     _lastSent = Date.now();
   } catch (err) {
     const db = getDb();
