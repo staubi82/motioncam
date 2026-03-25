@@ -1,4 +1,300 @@
-.login-body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-.login-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 2.5rem; width: 100%; max-width: 380px; box-shadow: var(--shadow); }
-.login-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
-.login-form { display: flex; flex-direction: column; }
+/* ── Login Page ───────────────────────────────────────────── */
+
+.login-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  position: relative;
+  background: #080c10;
+}
+
+/* Background grid */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Radial center glow */
+.login-body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(59,130,246,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Scanline effect */
+.scanline {
+  position: fixed;
+  top: -10%;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(59,130,246,0.03) 40%,
+    rgba(59,130,246,0.07) 50%,
+    rgba(59,130,246,0.03) 60%,
+    transparent 100%
+  );
+  animation: scan 6s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes scan {
+  0%   { top: -10%; }
+  100% { top: 110%; }
+}
+
+/* Wrap */
+.login-wrap {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 400px;
+  padding: 1.5rem;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Card */
+.login-card {
+  position: relative;
+  background: rgba(22, 27, 34, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 16px;
+  padding: 2.5rem 2rem 2rem;
+  box-shadow:
+    0 0 0 1px rgba(59,130,246,0.05),
+    0 20px 60px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+
+/* Subtle top-edge accent glow */
+.card-glow {
+  position: absolute;
+  top: -1px;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.7), transparent);
+}
+
+/* Camera icon */
+.login-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  color: var(--accent);
+  animation: fadeUp 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.login-icon svg {
+  width: 52px;
+  height: 52px;
+  filter: drop-shadow(0 0 8px rgba(59,130,246,0.4));
+}
+
+/* Header */
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.6s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.login-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.cursor {
+  display: inline-block;
+  color: var(--accent);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.login-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: var(--text-muted);
+}
+
+/* Flash error */
+.flash--error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(248,81,73,0.1);
+  border: 1px solid rgba(248,81,73,0.3);
+  color: #f85149;
+  border-radius: 8px;
+  padding: 0.6rem 0.875rem;
+  font-size: 0.8rem;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.25rem;
+  animation: fadeUp 0.3s ease both;
+}
+
+/* Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  animation: fadeUp 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  cursor: default;
+}
+
+.label-tag {
+  color: var(--accent);
+  opacity: 0.7;
+  font-size: 0.6rem;
+}
+
+.field-input {
+  background: rgba(13, 17, 23, 0.8);
+  border: 1px solid rgba(48, 54, 61, 0.8);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.field-input:focus {
+  border-color: rgba(59,130,246,0.6);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12), inset 0 0 0 1px rgba(59,130,246,0.1);
+}
+
+.field-input::placeholder {
+  color: rgba(125, 133, 144, 0.4);
+}
+
+/* Login button */
+.login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  padding: 0.8rem 1rem;
+  margin-top: 0.4rem;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.login-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
+}
+
+.login-btn:hover::before {
+  transform: translateX(100%);
+}
+
+.login-btn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 20px rgba(59,130,246,0.4);
+  transform: translateY(-1px);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* Footer */
+.login-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: rgba(125, 133, 144, 0.5);
+  animation: fadeUp 0.6s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--success); }
+  50%       { opacity: 0.5; box-shadow: 0 0 2px var(--success); }
+}

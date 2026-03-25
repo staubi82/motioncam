@@ -4,22 +4,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MotionCam — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/login.css">
 </head>
 <body class="login-body">
-  <div class="login-card">
-    <h1 class="login-title">MotionCam</h1>
-    <% if (typeof error !== 'undefined' && error) { %>
-      <div class="flash flash--error"><%= error %></div>
-    <% } %>
-    <form method="post" action="/login" class="login-form">
-      <label class="form-label" for="username">Benutzername</label>
-      <input class="form-input" type="text" id="username" name="username" required autofocus>
-      <label class="form-label" for="password">Passwort</label>
-      <input class="form-input" type="password" id="password" name="password" required>
-      <button class="btn btn--primary btn--full" type="submit">Anmelden</button>
-    </form>
+
+  <div class="scanline"></div>
+
+  <div class="bg-grid"></div>
+
+  <div class="login-wrap">
+
+    <div class="login-card">
+      <div class="card-glow"></div>
+
+      <div class="login-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 2" opacity="0.3"/>
+          <circle cx="24" cy="24" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="24" cy="24" r="4" fill="currentColor"/>
+          <line x1="24" y1="2" x2="24" y2="10" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="24" y1="38" x2="24" y2="46" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="2" y1="24" x2="10" y2="24" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="38" y1="24" x2="46" y2="24" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <div class="login-header">
+        <h1 class="login-title">MOTIONCAM<span class="cursor">_</span></h1>
+        <p class="login-sub">SYSTEM ACCESS</p>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="flash flash--error">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <%= error %>
+        </div>
+      <% } %>
+
+      <form method="post" action="/login" class="login-form">
+        <div class="field">
+          <label class="field-label" for="username">
+            <span class="label-tag">01</span> BENUTZER
+          </label>
+          <input class="field-input" type="text" id="username" name="username" required autofocus autocomplete="username" spellcheck="false">
+        </div>
+        <div class="field">
+          <label class="field-label" for="password">
+            <span class="label-tag">02</span> PASSWORT
+          </label>
+          <input class="field-input" type="password" id="password" name="password" required autocomplete="current-password">
+        </div>
+        <button class="login-btn" type="submit">
+          <span class="btn-text">ANMELDEN</span>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <span class="status-dot"></span>
+        <span>KAMERA-SYSTEM ONLINE</span>
+      </div>
+    </div>
+
   </div>
 </body>
 </html>
