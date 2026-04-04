@@ -12,6 +12,32 @@
   </nav>
 </div>
 
+<div class="settings-modal-overlay" id="trash-modal" aria-hidden="true">
+  <div class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="trash-modal-title">
+    <h3 id="trash-modal-title">Papierkorb jetzt endgültig leeren?</h3>
+    <p class="field-hint" style="margin-bottom:0.8rem;">Diese Aktion kann nicht rückgängig gemacht werden.</p>
+    <div class="field-group">
+      <label class="form-label">Sicherheits-Schieber
+        <div class="slider-wrapper">
+          <input type="range" id="trash-confirm-slider" min="0" max="100" step="1" value="0" data-unit=" %">
+          <span class="slider-value" id="trash-confirm-slider-value">0 %</span>
+        </div>
+      </label>
+      <p class="field-hint">Schiebe auf 100 %.</p>
+    </div>
+    <div class="field-group">
+      <label class="form-label">Bestätigungstext
+        <input class="form-input" type="text" id="trash-confirm-text" placeholder="LÖSCHEN">
+      </label>
+      <p class="field-hint">Tippe exakt <strong>LÖSCHEN</strong>.</p>
+    </div>
+    <div class="settings-modal__actions">
+      <button type="button" class="btn btn--secondary" id="trash-modal-cancel">Abbrechen</button>
+      <button type="button" class="btn btn--danger" id="trash-modal-confirm" disabled>Endgültig leeren</button>
+    </div>
+  </div>
+</div>
+
 <% if (flash) { %>
 <div class="alert alert--<%= flash.type %>"><%= flash.message %></div>
 <% } %>
@@ -233,17 +259,6 @@
           <input class="form-input" type="text" name="camera_device" value="<%= settings.camera_device %>">
         </label>
       </div>
-
-      <div class="field-group">
-        <label class="form-label">Papierkorb automatisch leeren
-          <select class="form-input" name="trash_retention_days">
-            <% [[0,'Nie automatisch löschen'],[7,'Nach 7 Tagen'],[14,'Nach 14 Tagen'],[30,'Nach 30 Tagen'],[60,'Nach 60 Tagen']].forEach(([v,l]) => { %>
-            <option value="<%= v %>" <%= (settings.trash_retention_days || '14') == v ? 'selected' : '' %>><%= l %></option>
-            <% }) %>
-          </select>
-        </label>
-        <p class="field-hint">0 = nie automatisch löschen. Betrifft nur Aufnahmen im Papierkorb.</p>
-      </div>
     </section>
 
     <%# ── Audio ─────────────────────────────────────────── %>
@@ -274,6 +289,33 @@
         <label class="form-label">Audio-Gerät
           <input class="form-input" type="text" name="audio_device" value="<%= settings.audio_device %>">
         </label>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="field-group">
+        <p class="field-group__title">Papierkorb</p>
+        <div class="settings-row">
+          <span class="settings-row__label">Papierkorb aktiv</span>
+          <label class="toggle-row">
+            <span class="toggle">
+              <input type="checkbox" name="trash_enabled" value="true" <%= (settings.trash_enabled || 'true') === 'true' ? 'checked' : '' %>>
+              <span class="toggle-track"></span>
+            </span>
+          </label>
+        </div>
+        <label class="form-label">Automatisch leeren
+          <select class="form-input" name="trash_retention_days">
+            <% [[0,'Nie automatisch löschen'],[7,'Nach 7 Tagen'],[14,'Nach 14 Tagen'],[30,'Nach 30 Tagen'],[60,'Nach 60 Tagen']].forEach(([v,l]) => { %>
+            <option value="<%= v %>" <%= (settings.trash_retention_days || '14') == v ? 'selected' : '' %>><%= l %></option>
+            <% }) %>
+          </select>
+        </label>
+        <p class="field-hint">0 = nie automatisch löschen.</p>
+      </div>
+      <div class="field-group">
+        <button type="button" id="trash-empty-btn" class="btn btn--danger">Jetzt leeren</button>
+        <p class="field-hint" id="trash-empty-status" style="margin-top:0.45rem;"></p>
       </div>
     </section>
 

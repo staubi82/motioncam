@@ -140,4 +140,20 @@ describe('storageService', () => {
     expect(row).toBeTruthy();
     expect(fs.existsSync(fp)).toBe(true);
   });
+
+  test('moveRecordingToTrash deletes immediately when trash is disabled', () => {
+    settingsService.set('trash_enabled', 'false');
+    const fp = path.join(tmpDir, 'trash-disabled.mp4');
+    fs.writeFileSync(fp, 'x');
+    const db = getDb();
+    const id = db.prepare("INSERT INTO recordings (filename, filepath) VALUES ('trash-disabled.mp4', ?)").run(fp).lastInsertRowid;
+
+    const result = storageService.moveRecordingToTrash(id);
+    expect(result.deleted).toBe(true);
+    expect(result.movedToTrash).toBe(false);
+    expect(fs.existsSync(fp)).toBe(false);
+    const row = db.prepare('SELECT * FROM recordings WHERE id=?').get(id);
+    expect(row).toBeUndefined();
+    settingsService.set('trash_enabled', 'true');
+  });
 });

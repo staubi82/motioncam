@@ -21,6 +21,10 @@ function _hardDelete(rec) {
   db.prepare('DELETE FROM recordings WHERE id=?').run(rec.id);
 }
 
+function _trashEnabled() {
+  return settingsService.getBool('trash_enabled');
+}
+
 function moveRecordingToTrash(id) {
   const db = getDb();
   const rec = db.prepare('SELECT * FROM recordings WHERE id=?').get(id);
@@ -28,10 +32,15 @@ function moveRecordingToTrash(id) {
   if (rec.is_favorite) {
     throw Object.assign(new Error('Favoriten sind vor dem Löschen geschützt'), { status: 409 });
   }
+  if (!_trashEnabled()) {
+    _hardDelete(rec);
+    return { deleted: true, movedToTrash: false };
+  }
   if (rec.deleted_at) {
     throw Object.assign(new Error('Aufnahme ist bereits im Papierkorb'), { status: 409 });
   }
   db.prepare("UPDATE recordings SET deleted_at=datetime('now') WHERE id=?").run(id);
+  return { deleted: false, movedToTrash: true };
 }
 
 function restoreRecording(id) {
@@ -56,8 +65,10 @@ function permanentlyDeleteRecording(id) {
 
 function moveRecordingsToTrash(ids) {
   const db = getDb();
+  const trashEnabled = _trashEnabled();
   const result = {
     movedIds: [],
+    deletedIds: [],
     protectedIds: [],
     missingIds: [],
     alreadyTrashedIds: [],
@@ -71,6 +82,11 @@ function moveRecordingsToTrash(ids) {
       }
       if (rec.is_favorite) {
         result.protectedIds.push(id);
+        continue;
+      }
+      if (!trashEnabled) {
+        _hardDelete(rec);
+        result.deletedIds.push(id);
         continue;
       }
       if (rec.deleted_at) {
@@ -137,6 +153,16 @@ function permanentlyDeleteRecordings(ids) {
   return result;
 }
 
+function permanentlyDeleteAllTrashed() {
+  const db = getDb();
+  const rows = db.prepare('SELECT * FROM recordings WHERE deleted_at IS NOT NULL').all();
+  const tx = db.transaction((list) => {
+    for (const rec of list) _hardDelete(rec);
+  });
+  tx(rows);
+  return { deletedCount: rows.length };
+}
+
 function purgeExpiredTrash(retentionDays = null) {
   const db = getDb();
   const days = retentionDays === null
@@ -168,5 +194,6 @@ module.exports = {
   restoreRecordings,
   permanentlyDeleteRecording,
   permanentlyDeleteRecordings,
+  permanentlyDeleteAllTrashed,
   purgeExpiredTrash,
 };

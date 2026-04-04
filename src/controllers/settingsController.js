@@ -5,12 +5,13 @@ const mailService = require('../services/mailService');
 const motionService = require('../services/motionService');
 const ffmpegService = require('../services/ffmpegService');
 const recordingService = require('../services/recordingService');
+const storageService = require('../services/storageService');
 
 const EDITABLE_KEYS = [
   'detection_enabled', 'detection_sensitivity', 'detection_min_area', 'detection_min_frames', 'detection_lightswitch_percent', 'event_cooldown_seconds',
   'recording_enabled', 'recording_nachlaufzeit_seconds', 'max_clip_duration_seconds', 'video_fps', 'video_resolution',
   'video_bitrate', 'audio_enabled', 'audio_bitrate', 'storage_path', 'thumbnail_path',
-  'snapshot_path', 'camera_device', 'audio_device', 'trash_retention_days',
+  'snapshot_path', 'camera_device', 'audio_device', 'trash_enabled', 'trash_retention_days',
   'mail_enabled', 'mail_cooldown_seconds', 'mail_snapshot_attach',
   'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_tls', 'smtp_from', 'mail_recipient',
   'overlay_enabled', 'overlay_show_datetime', 'overlay_show_resolution',
@@ -32,7 +33,7 @@ function saveSettings(req, res, next) {
     for (const key of EDITABLE_KEYS) {
       if (key in req.body) update[key] = req.body[key];
       // Checkboxes: if not in body, they are false
-      else if (['detection_enabled', 'recording_enabled', 'audio_enabled', 'mail_enabled', 'smtp_tls', 'mail_snapshot_attach', 'overlay_enabled', 'overlay_show_datetime', 'overlay_show_resolution', 'overlay_show_location'].includes(key)) {
+      else if (['detection_enabled', 'recording_enabled', 'audio_enabled', 'mail_enabled', 'smtp_tls', 'mail_snapshot_attach', 'overlay_enabled', 'overlay_show_datetime', 'overlay_show_resolution', 'overlay_show_location', 'trash_enabled'].includes(key)) {
         update[key] = 'false';
       }
     }
@@ -107,4 +108,19 @@ async function testMotion(req, res, next) {
   }
 }
 
-module.exports = { showSettings, saveSettings, testMail, changePassword, testMotion };
+function emptyTrashNow(req, res, next) {
+  try {
+    const text = String(req.body?.confirmText || '').trim().toUpperCase();
+    const slider = parseInt(req.body?.confirmSlider, 10);
+    const validText = text === 'LÖSCHEN' || text === 'LOESCHEN';
+    if (!validText || slider !== 100) {
+      return res.status(400).json({ ok: false, message: 'Bestätigung fehlgeschlagen.' });
+    }
+    const result = storageService.permanentlyDeleteAllTrashed();
+    return res.json({ ok: true, deletedCount: result.deletedCount });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+module.exports = { showSettings, saveSettings, testMail, changePassword, testMotion, emptyTrashNow };

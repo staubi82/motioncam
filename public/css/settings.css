@@ -221,3 +221,37 @@
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* ── Trash Modal ────────────────────────────────────── */
+.settings-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+.settings-modal-overlay.is-open {
+  display: flex;
+}
+.settings-modal {
+  width: 100%;
+  max-width: 460px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem 1rem;
+}
+.settings-modal h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+.settings-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}

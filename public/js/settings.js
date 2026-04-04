@@ -109,6 +109,86 @@ document.getElementById('test-motion-btn')?.addEventListener('click', async () =
   }
 });
 
+// Trash empty dialog (2-factor confirm)
+const trashModal = document.getElementById('trash-modal');
+const trashEmptyBtn = document.getElementById('trash-empty-btn');
+const trashStatus = document.getElementById('trash-empty-status');
+const trashModalCancel = document.getElementById('trash-modal-cancel');
+const trashModalConfirm = document.getElementById('trash-modal-confirm');
+const trashConfirmSlider = document.getElementById('trash-confirm-slider');
+const trashConfirmSliderValue = document.getElementById('trash-confirm-slider-value');
+const trashConfirmText = document.getElementById('trash-confirm-text');
+
+function updateTrashConfirmState() {
+  if (!trashModalConfirm || !trashConfirmSlider || !trashConfirmText) return;
+  const sliderOk = Number(trashConfirmSlider.value) === 100;
+  const textOk = trashConfirmText.value.trim().toUpperCase() === 'LÖSCHEN';
+  trashModalConfirm.disabled = !(sliderOk && textOk);
+}
+
+function closeTrashModal() {
+  if (!trashModal) return;
+  trashModal.classList.remove('is-open');
+  trashModal.setAttribute('aria-hidden', 'true');
+}
+
+function openTrashModal() {
+  if (!trashModal || !trashConfirmSlider || !trashConfirmText || !trashConfirmSliderValue) return;
+  trashConfirmSlider.value = '0';
+  trashConfirmSliderValue.textContent = '0 %';
+  trashConfirmText.value = '';
+  updateTrashConfirmState();
+  trashModal.classList.add('is-open');
+  trashModal.setAttribute('aria-hidden', 'false');
+  trashConfirmSlider.focus();
+}
+
+trashEmptyBtn?.addEventListener('click', openTrashModal);
+trashModalCancel?.addEventListener('click', closeTrashModal);
+trashModal?.addEventListener('click', (e) => {
+  if (e.target === trashModal) closeTrashModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && trashModal?.classList.contains('is-open')) closeTrashModal();
+});
+
+trashConfirmSlider?.addEventListener('input', () => {
+  if (trashConfirmSliderValue && trashConfirmSlider) {
+    trashConfirmSliderValue.textContent = `${trashConfirmSlider.value} %`;
+  }
+  updateTrashConfirmState();
+});
+trashConfirmText?.addEventListener('input', updateTrashConfirmState);
+
+trashModalConfirm?.addEventListener('click', async () => {
+  if (!trashConfirmSlider || !trashConfirmText || !trashStatus) return;
+  trashModalConfirm.disabled = true;
+  try {
+    const res = await fetch('/settings/trash-empty', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        confirmSlider: Number(trashConfirmSlider.value),
+        confirmText: trashConfirmText.value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      trashStatus.textContent = `Papierkorb geleert: ${data.deletedCount} Datei(en) entfernt.`;
+      trashStatus.style.color = 'var(--success)';
+      closeTrashModal();
+      return;
+    }
+    trashStatus.textContent = data.message || 'Papierkorb konnte nicht geleert werden.';
+    trashStatus.style.color = 'var(--danger)';
+  } catch {
+    trashStatus.textContent = 'Verbindungsfehler beim Leeren des Papierkorbs.';
+    trashStatus.style.color = 'var(--danger)';
+  } finally {
+    updateTrashConfirmState();
+  }
+});
+
 // Hamburger menu
 document.querySelector('.hamburger')?.addEventListener('click', () => {
   document.querySelector('.main-nav')?.classList.toggle('open');
