@@ -262,63 +262,65 @@
       </div>
     </section>
 
-    <%# ── Audio ─────────────────────────────────────────── %>
-    <section class="settings-section" id="audio">
-      <h2>Audio</h2>
+    <div class="settings-stack-right">
+      <%# ── Audio ─────────────────────────────────────────── %>
+      <section class="settings-section" id="audio">
+        <h2>Audio</h2>
 
-      <div class="settings-row">
-        <span class="settings-row__label">Audio aufnehmen</span>
-        <label class="toggle-row">
-          <span class="toggle">
-            <input type="checkbox" name="audio_enabled" value="true" <%= settings.audio_enabled === 'true' ? 'checked' : '' %>>
-            <span class="toggle-track"></span>
-          </span>
-        </label>
-      </div>
-
-      <div class="field-group" style="margin-top:1rem;">
-        <label class="form-label">Audio-Bitrate
-          <select class="form-input" name="audio_bitrate">
-            <% [['64k','64 kbps'],['128k','128 kbps'],['192k','192 kbps'],['256k','256 kbps']].forEach(([v,l]) => { %>
-            <option value="<%= v %>" <%= settings.audio_bitrate === v ? 'selected' : '' %>><%= l %></option>
-            <% }) %>
-          </select>
-        </label>
-      </div>
-
-      <div class="field-group">
-        <label class="form-label">Audio-Gerät
-          <input class="form-input" type="text" name="audio_device" value="<%= settings.audio_device %>">
-        </label>
-      </div>
-    </section>
-
-    <section class="settings-section settings-section--right-column" id="papierkorb">
-      <h2>Papierkorb</h2>
-      <div class="field-group">
         <div class="settings-row">
-          <span class="settings-row__label">Papierkorb aktiv</span>
+          <span class="settings-row__label">Audio aufnehmen</span>
           <label class="toggle-row">
             <span class="toggle">
-              <input type="checkbox" name="trash_enabled" value="true" <%= (settings.trash_enabled || 'true') === 'true' ? 'checked' : '' %>>
+              <input type="checkbox" name="audio_enabled" value="true" <%= settings.audio_enabled === 'true' ? 'checked' : '' %>>
               <span class="toggle-track"></span>
             </span>
           </label>
         </div>
-        <label class="form-label">Automatisch leeren
-          <select class="form-input" name="trash_retention_days">
-            <% [[0,'Nie automatisch löschen'],[7,'Nach 7 Tagen'],[14,'Nach 14 Tagen'],[30,'Nach 30 Tagen'],[60,'Nach 60 Tagen']].forEach(([v,l]) => { %>
-            <option value="<%= v %>" <%= (settings.trash_retention_days || '14') == v ? 'selected' : '' %>><%= l %></option>
-            <% }) %>
-          </select>
-        </label>
-        <p class="field-hint">0 = nie automatisch löschen.</p>
-      </div>
-      <div class="field-group">
-        <button type="button" id="trash-empty-btn" class="btn btn--danger">Jetzt leeren</button>
-        <p class="field-hint" id="trash-empty-status" style="margin-top:0.45rem;"></p>
-      </div>
-    </section>
+
+        <div class="field-group" style="margin-top:1rem;">
+          <label class="form-label">Audio-Bitrate
+            <select class="form-input" name="audio_bitrate">
+              <% [['64k','64 kbps'],['128k','128 kbps'],['192k','192 kbps'],['256k','256 kbps']].forEach(([v,l]) => { %>
+              <option value="<%= v %>" <%= settings.audio_bitrate === v ? 'selected' : '' %>><%= l %></option>
+              <% }) %>
+            </select>
+          </label>
+        </div>
+
+        <div class="field-group">
+          <label class="form-label">Audio-Gerät
+            <input class="form-input" type="text" name="audio_device" value="<%= settings.audio_device %>">
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-section" id="papierkorb">
+        <h2>Papierkorb</h2>
+        <div class="field-group">
+          <div class="settings-row">
+            <span class="settings-row__label">Papierkorb aktiv</span>
+            <label class="toggle-row">
+              <span class="toggle">
+                <input type="checkbox" name="trash_enabled" value="true" <%= (settings.trash_enabled || 'true') === 'true' ? 'checked' : '' %>>
+                <span class="toggle-track"></span>
+              </span>
+            </label>
+          </div>
+          <label class="form-label">Automatisch leeren
+            <select class="form-input" name="trash_retention_days">
+              <% [[0,'Nie automatisch löschen'],[7,'Nach 7 Tagen'],[14,'Nach 14 Tagen'],[30,'Nach 30 Tagen'],[60,'Nach 60 Tagen']].forEach(([v,l]) => { %>
+              <option value="<%= v %>" <%= (settings.trash_retention_days || '14') == v ? 'selected' : '' %>><%= l %></option>
+              <% }) %>
+            </select>
+          </label>
+          <p class="field-hint">0 = nie automatisch löschen.</p>
+        </div>
+        <div class="field-group">
+          <button type="button" id="trash-empty-btn" class="btn btn--danger">Jetzt leeren</button>
+          <p class="field-hint" id="trash-empty-status" style="margin-top:0.45rem;"></p>
+        </div>
+      </section>
+    </div>
 
     <%# ── E-Mail ─────────────────────────────────────────── %>
     <section class="settings-section settings-section--wide" id="email">

@@ -43,6 +43,11 @@
   align-items: start;
 }
 
+.settings-stack-right {
+  display: grid;
+  gap: 1.25rem;
+}
+
 .settings-save {
   margin-bottom: 1.5rem;
 }
@@ -55,6 +60,9 @@
     grid-column: span 2;
   }
   .settings-section--right-column {
+    grid-column: 2;
+  }
+  .settings-stack-right {
     grid-column: 2;
   }
 }
