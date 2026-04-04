@@ -20,6 +20,7 @@ const DEFAULTS = [
   ['snapshot_path', config.snapshotPath],
   ['camera_device', config.cameraDevice],
   ['audio_device', config.audioDevice],
+  ['trash_retention_days', '14'],
   ['mail_enabled', 'false'],
   ['mail_cooldown_seconds', '300'],
   ['mail_snapshot_attach', 'true'],

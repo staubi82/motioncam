@@ -10,7 +10,7 @@ const EDITABLE_KEYS = [
   'detection_enabled', 'detection_sensitivity', 'detection_min_area', 'detection_min_frames', 'detection_lightswitch_percent', 'event_cooldown_seconds',
   'recording_enabled', 'recording_nachlaufzeit_seconds', 'max_clip_duration_seconds', 'video_fps', 'video_resolution',
   'video_bitrate', 'audio_enabled', 'audio_bitrate', 'storage_path', 'thumbnail_path',
-  'snapshot_path', 'camera_device', 'audio_device',
+  'snapshot_path', 'camera_device', 'audio_device', 'trash_retention_days',
   'mail_enabled', 'mail_cooldown_seconds', 'mail_snapshot_attach',
   'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_tls', 'smtp_from', 'mail_recipient',
   'overlay_enabled', 'overlay_show_datetime', 'overlay_show_resolution',

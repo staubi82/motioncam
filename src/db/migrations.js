@@ -63,6 +63,7 @@ function runMigrations() {
   // Idempotent: add detection_min_frames setting if not present
   db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('detection_min_frames', '2')").run();
   db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('detection_lightswitch_percent', '25')").run();
+  db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('trash_retention_days', '14')").run();
 }
 
 module.exports = { runMigrations };

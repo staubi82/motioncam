@@ -233,6 +233,17 @@
           <input class="form-input" type="text" name="camera_device" value="<%= settings.camera_device %>">
         </label>
       </div>
+
+      <div class="field-group">
+        <label class="form-label">Papierkorb automatisch leeren
+          <select class="form-input" name="trash_retention_days">
+            <% [[0,'Nie automatisch löschen'],[7,'Nach 7 Tagen'],[14,'Nach 14 Tagen'],[30,'Nach 30 Tagen'],[60,'Nach 60 Tagen']].forEach(([v,l]) => { %>
+            <option value="<%= v %>" <%= (settings.trash_retention_days || '14') == v ? 'selected' : '' %>><%= l %></option>
+            <% }) %>
+          </select>
+        </label>
+        <p class="field-hint">0 = nie automatisch löschen. Betrifft nur Aufnahmen im Papierkorb.</p>
+      </div>
     </section>
 
     <%# ── Audio ─────────────────────────────────────────── %>

@@ -100,4 +100,44 @@ describe('storageService', () => {
     const row = db.prepare('SELECT * FROM recordings WHERE id=?').get(id);
     expect(row).toBeUndefined();
   });
+
+  test('purgeExpiredTrash respects retention days and deletes only old trash', () => {
+    const db = getDb();
+    const fpOld = path.join(tmpDir, 'old-trash.mp4');
+    const fpRecent = path.join(tmpDir, 'recent-trash.mp4');
+    fs.writeFileSync(fpOld, 'x');
+    fs.writeFileSync(fpRecent, 'y');
+
+    const oldId = db.prepare(
+      "INSERT INTO recordings (filename, filepath, deleted_at) VALUES ('old-trash.mp4', ?, '2000-01-01 00:00:00')"
+    ).run(fpOld).lastInsertRowid;
+    const recentId = db.prepare(
+      "INSERT INTO recordings (filename, filepath, deleted_at) VALUES ('recent-trash.mp4', ?, datetime('now'))"
+    ).run(fpRecent).lastInsertRowid;
+
+    const result = storageService.purgeExpiredTrash(7);
+    expect(result.deletedCount).toBeGreaterThanOrEqual(1);
+
+    const oldRow = db.prepare('SELECT * FROM recordings WHERE id=?').get(oldId);
+    const recentRow = db.prepare('SELECT * FROM recordings WHERE id=?').get(recentId);
+    expect(oldRow).toBeUndefined();
+    expect(recentRow).toBeTruthy();
+    expect(fs.existsSync(fpOld)).toBe(false);
+    expect(fs.existsSync(fpRecent)).toBe(true);
+  });
+
+  test('purgeExpiredTrash with retention 0 does not delete anything', () => {
+    const db = getDb();
+    const fp = path.join(tmpDir, 'never-delete.mp4');
+    fs.writeFileSync(fp, 'x');
+    const id = db.prepare(
+      "INSERT INTO recordings (filename, filepath, deleted_at) VALUES ('never-delete.mp4', ?, '2000-01-01 00:00:00')"
+    ).run(fp).lastInsertRowid;
+
+    const result = storageService.purgeExpiredTrash(0);
+    expect(result.deletedCount).toBe(0);
+    const row = db.prepare('SELECT * FROM recordings WHERE id=?').get(id);
+    expect(row).toBeTruthy();
+    expect(fs.existsSync(fp)).toBe(true);
+  });
 });

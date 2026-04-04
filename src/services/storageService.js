@@ -137,6 +137,29 @@ function permanentlyDeleteRecordings(ids) {
   return result;
 }
 
+function purgeExpiredTrash(retentionDays = null) {
+  const db = getDb();
+  const days = retentionDays === null
+    ? parseInt(settingsService.get('trash_retention_days') || '0', 10)
+    : parseInt(retentionDays, 10);
+  if (!Number.isInteger(days) || days <= 0) {
+    return { deletedCount: 0, retentionDays: 0 };
+  }
+
+  const cutoffDate = new Date(Date.now() - (days * 24 * 60 * 60 * 1000));
+  const cutoff = cutoffDate.toISOString().slice(0, 19).replace('T', ' ');
+  const rows = db.prepare(
+    'SELECT * FROM recordings WHERE deleted_at IS NOT NULL AND deleted_at <= ?'
+  ).all(cutoff);
+
+  const tx = db.transaction((list) => {
+    for (const rec of list) _hardDelete(rec);
+  });
+  tx(rows);
+
+  return { deletedCount: rows.length, retentionDays: days };
+}
+
 module.exports = {
   getDiskUsage,
   moveRecordingToTrash,
@@ -145,4 +168,5 @@ module.exports = {
   restoreRecordings,
   permanentlyDeleteRecording,
   permanentlyDeleteRecordings,
+  purgeExpiredTrash,
 };
