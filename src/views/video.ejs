@@ -69,19 +69,94 @@
     <% } %>
   </div>
 </div>
+
+<div class="modal-overlay" id="video-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+    </div>
+    <h2 class="modal__title" id="video-modal-title">Aktion bestätigen</h2>
+    <p class="modal__body" id="video-modal-body">Bitte bestätigen.</p>
+    <div class="modal__actions">
+      <button class="btn btn--secondary" id="video-modal-cancel">Abbrechen</button>
+      <button class="btn btn--danger" id="video-modal-confirm">Bestätigen</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  const modal = document.getElementById('video-modal');
+  const modalTitle = document.getElementById('video-modal-title');
+  const modalBody = document.getElementById('video-modal-body');
+  const modalCancel = document.getElementById('video-modal-cancel');
+  const modalConfirm = document.getElementById('video-modal-confirm');
+  const defaultConfirmText = modalConfirm?.textContent || 'Bestätigen';
+  const defaultCancelText = modalCancel?.textContent || 'Abbrechen';
+  let pendingAction = null;
+
+  function openModal({ title, body, onConfirm, confirmLabel, cancelLabel, hideCancel = false }) {
+    modalTitle.textContent = title;
+    modalBody.textContent = body;
+    pendingAction = onConfirm || (async () => {});
+    modalConfirm.textContent = confirmLabel || defaultConfirmText;
+    modalCancel.textContent = cancelLabel || defaultCancelText;
+    modalCancel.style.display = hideCancel ? 'none' : '';
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    modalConfirm.focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    modalConfirm.textContent = defaultConfirmText;
+    modalCancel.textContent = defaultCancelText;
+    modalCancel.style.display = '';
+    pendingAction = null;
+  }
+
+  function openInfoModal(title, body) {
+    openModal({
+      title,
+      body,
+      confirmLabel: 'OK',
+      hideCancel: true,
+    });
+  }
+
+  modalCancel.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  modalConfirm.addEventListener('click', async () => {
+    if (!pendingAction) return;
+    const action = pendingAction;
+    closeModal();
+    await action();
+  });
+
   document.getElementById('delete-btn').addEventListener('click', async function() {
     const permanent = this.dataset.permanent === '1';
-    if (!confirm(permanent ? 'Aufnahme endgültig löschen?' : 'In Papierkorb verschieben?')) return;
-    const url = permanent ? ('/videos/' + this.dataset.id + '?permanent=1') : ('/videos/' + this.dataset.id);
-    const res = await fetch(url, { method: 'DELETE' });
-    if (res.ok) {
-      window.location.href = '<%= archiveUrl %>';
-      return;
-    }
-    let data = {};
-    try { data = await res.json(); } catch {}
-    alert(data.message || 'Löschen fehlgeschlagen');
+    openModal({
+      title: permanent ? 'Aufnahme endgültig löschen?' : 'In Papierkorb verschieben?',
+      body: permanent
+        ? 'Diese Aufnahme wird endgültig gelöscht.'
+        : 'Diese Aufnahme wird in den Papierkorb verschoben.',
+      confirmLabel: permanent ? 'Endgültig löschen' : 'Verschieben',
+      onConfirm: async () => {
+        const url = permanent ? ('/videos/' + this.dataset.id + '?permanent=1') : ('/videos/' + this.dataset.id);
+        const res = await fetch(url, { method: 'DELETE' });
+        if (res.ok) {
+          window.location.href = '<%= archiveUrl %>';
+          return;
+        }
+        let data = {};
+        try { data = await res.json(); } catch {}
+        openInfoModal('Aktion fehlgeschlagen', data.message || 'Löschen fehlgeschlagen');
+      },
+    });
   });
 
   document.getElementById('restore-btn')?.addEventListener('click', async function() {
@@ -92,7 +167,7 @@
     }
     let data = {};
     try { data = await res.json(); } catch {}
-    alert(data.message || 'Wiederherstellen fehlgeschlagen');
+    openInfoModal('Aktion fehlgeschlagen', data.message || 'Wiederherstellen fehlgeschlagen');
   });
 
   document.getElementById('star-btn')?.addEventListener('click', async function() {
@@ -109,10 +184,10 @@
         this.dataset.favorite = String(next);
         this.textContent = next === 1 ? '⭐' : '☆';
       } else {
-        alert('Fehler beim Aktualisieren');
+        openInfoModal('Aktion fehlgeschlagen', 'Fehler beim Aktualisieren');
       }
     } catch {
-      alert('Fehler beim Aktualisieren');
+      openInfoModal('Aktion fehlgeschlagen', 'Fehler beim Aktualisieren');
     }
   });
 </script>
