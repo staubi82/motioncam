@@ -58,6 +58,17 @@
           </label>
           <input class="field-input" type="password" id="password" name="password" required autocomplete="current-password">
         </div>
+        <label class="remember-toggle" for="rememberMe">
+          <input
+            class="remember-checkbox"
+            type="checkbox"
+            id="rememberMe"
+            name="rememberMe"
+            value="1"
+            <%= rememberMe ? 'checked' : '' %>
+          >
+          <span>Dauerhaft eingeloggt bleiben</span>
+        </label>
         <button class="login-btn" type="submit">
           <span class="btn-text">ANMELDEN</span>
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>

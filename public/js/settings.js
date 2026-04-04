@@ -22,6 +22,45 @@ document.querySelectorAll('.position-tile').forEach(tile => {
   });
 });
 
+// Detection profile presets
+document.getElementById('apply-detection-profile')?.addEventListener('click', () => {
+  const profile = document.getElementById('detection-profile-select')?.value;
+  const presets = {
+    indoor_less_false_alarms: {
+      detection_min_area: 900,
+      detection_min_frames: 6,
+      detection_lightswitch_percent: 40,
+      event_cooldown_seconds: 120,
+    },
+    balanced: {
+      detection_min_area: 650,
+      detection_min_frames: 4,
+      detection_lightswitch_percent: 25,
+      event_cooldown_seconds: 60,
+    },
+    high_sensitivity: {
+      detection_min_area: 400,
+      detection_min_frames: 3,
+      detection_lightswitch_percent: 15,
+      event_cooldown_seconds: 30,
+    },
+  };
+
+  const selected = presets[profile];
+  if (!selected) return;
+
+  const setField = (name, value) => {
+    const field = document.querySelector(`[name="${name}"]`);
+    if (!field) return;
+    field.value = String(value);
+    if (field.type === 'range') {
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
+  Object.entries(selected).forEach(([key, value]) => setField(key, value));
+});
+
 // Test mail button
 document.getElementById('test-mail-btn')?.addEventListener('click', async () => {
   const btn = document.getElementById('test-mail-btn');

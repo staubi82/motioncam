@@ -33,6 +33,20 @@
         </label>
       </div>
 
+      <div class="field-group detection-profile">
+        <label class="form-label">Erkennungs-Profil
+          <div class="detection-profile__row">
+            <select class="form-input" id="detection-profile-select">
+              <option value="indoor_less_false_alarms">Indoor (weniger Fehlalarme durch Licht)</option>
+              <option value="balanced">Ausgewogen</option>
+              <option value="high_sensitivity">Hohe Empfindlichkeit</option>
+            </select>
+            <button type="button" id="apply-detection-profile" class="btn btn--secondary">Profil anwenden</button>
+          </div>
+        </label>
+        <p class="field-hint">Setzt mehrere Werte auf einmal. Danach unten auf „Speichern“ klicken.</p>
+      </div>
+
       <div class="field-group">
         <label class="form-label">Mindestfläche (px)
           <div class="slider-wrapper">
@@ -51,6 +65,24 @@
           </div>
         </label>
         <p class="field-hint">Wie viele aufeinanderfolgende Frames Bewegung enthalten müssen. Höher = weniger Fehlalarme.</p>
+      </div>
+
+      <div class="field-group">
+        <label class="form-label">Lichtwechsel-Toleranz (%)
+          <div class="slider-wrapper">
+            <input
+              type="range"
+              name="detection_lightswitch_percent"
+              min="0"
+              max="100"
+              step="1"
+              value="<%= settings.detection_lightswitch_percent || '25' %>"
+              data-unit=" %"
+            >
+            <span class="slider-value"><%= settings.detection_lightswitch_percent || '25' %> %</span>
+          </div>
+        </label>
+        <p class="field-hint">Ignoriert globale Helligkeitsänderungen (z. B. Sonne/Wolken). Höher = unempfindlicher gegen Lichtwechsel.</p>
       </div>
 
       <div class="field-group">

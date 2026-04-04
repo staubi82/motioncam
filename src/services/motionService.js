@@ -7,6 +7,7 @@ const settingsService = require('./settingsService');
 const CONF_MAP = {
   detection_min_area: 'threshold',
   detection_min_frames: 'minimum_motion_frames',
+  detection_lightswitch_percent: 'lightswitch_percent',
 };
 
 function _rewriteConf(confPath) {

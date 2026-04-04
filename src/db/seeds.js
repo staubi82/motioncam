@@ -6,6 +6,7 @@ const DEFAULTS = [
   ['detection_enabled', 'true'],
   ['detection_min_area', '500'],
   ['detection_min_frames', '4'],
+  ['detection_lightswitch_percent', '25'],
   ['event_cooldown_seconds', '60'],
   ['recording_enabled', 'true'],
   ['recording_nachlaufzeit_seconds', '30'],

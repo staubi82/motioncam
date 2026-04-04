@@ -42,6 +42,24 @@ describe('POST /login', () => {
     expect(res.headers.location).toBe('/dashboard');
   });
 
+  test('sets a persistent cookie when rememberMe is checked', async () => {
+    const res = await request(app)
+      .post('/login')
+      .send('username=admin&password=testpass&rememberMe=1');
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('/dashboard');
+    expect(res.headers['set-cookie'][0]).toContain('Expires=');
+  });
+
+  test('keeps session cookie when rememberMe is not checked', async () => {
+    const res = await request(app)
+      .post('/login')
+      .send('username=admin&password=testpass');
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('/dashboard');
+    expect(res.headers['set-cookie'][0]).not.toContain('Expires=');
+  });
+
   test('redirects back to /login on wrong password', async () => {
     const res = await request(app)
       .post('/login')

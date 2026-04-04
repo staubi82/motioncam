@@ -201,6 +201,25 @@
   color: rgba(125, 133, 144, 0.4);
 }
 
+.remember-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  user-select: none;
+  cursor: pointer;
+}
+
+.remember-checkbox {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 /* Login button */
 .login-btn {
   display: flex;
