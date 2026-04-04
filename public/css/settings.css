@@ -53,6 +53,9 @@
   .settings-section--wide {
     grid-column: span 2;
   }
+  .settings-section--right-column {
+    grid-column: 2;
+  }
 }
 
 /* ── Section ────────────────────────────────────────── */
