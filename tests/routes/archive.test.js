@@ -36,6 +36,7 @@ describe('GET /archive', () => {
 
   test('shows recordings when present', async () => {
     const db = getDb();
+    db.prepare('DELETE FROM recordings').run();
     db.prepare(
       "INSERT INTO recordings (filename, filepath, processed) VALUES ('test.mp4', '/tmp/test.mp4', 1)"
     ).run();
@@ -48,11 +49,24 @@ describe('GET /archive', () => {
     const res = await request(app).get('/archive?page=1');
     expect(res.status).toBe(200);
   });
+
+  test('redirects to last valid page when requested page is out of range', async () => {
+    const db = getDb();
+    db.prepare('DELETE FROM recordings').run();
+    db.prepare(
+      "INSERT INTO recordings (filename, filepath, processed) VALUES ('only-one.mp4', '/tmp/only-one.mp4', 1)"
+    ).run();
+
+    const res = await request(app).get('/archive?page=4&per_page=8');
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('/archive?page=1&per_page=8');
+  });
 });
 
 describe('GET /archive?favorites=1', () => {
   test('returns only favorite recordings', async () => {
     const db = getDb();
+    db.prepare('DELETE FROM recordings').run();
     db.prepare(
       "INSERT INTO recordings (filename, filepath, processed, is_favorite) VALUES ('fav.mp4', '/tmp/fav.mp4', 1, 1)"
     ).run();
@@ -68,5 +82,22 @@ describe('GET /archive?favorites=1', () => {
   test('pagination preserves favorites filter', async () => {
     const res = await request(app).get('/archive?favorites=1&page=1');
     expect(res.status).toBe(200);
+  });
+});
+
+describe('GET /archive?trash=1', () => {
+  test('shows only trashed recordings', async () => {
+    const db = getDb();
+    db.prepare('DELETE FROM recordings').run();
+    db.prepare(
+      "INSERT INTO recordings (filename, filepath, processed, deleted_at) VALUES ('trashed.mp4', '/tmp/trashed.mp4', 1, datetime('now'))"
+    ).run();
+    db.prepare(
+      "INSERT INTO recordings (filename, filepath, processed) VALUES ('active.mp4', '/tmp/active.mp4', 1)"
+    ).run();
+    const res = await request(app).get('/archive?trash=1');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('trashed.mp4');
+    expect(res.text).not.toContain('active.mp4');
   });
 });

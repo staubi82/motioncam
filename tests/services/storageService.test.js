@@ -30,18 +30,74 @@ describe('storageService', () => {
     expect(storageService.getDiskUsage()).toBe(100);
   });
 
-  test('deleteRecording throws 404 for unknown id', () => {
-    expect(() => storageService.deleteRecording(9999)).toThrow('Recording not found');
+  test('moveRecordingToTrash throws 404 for unknown id', () => {
+    expect(() => storageService.moveRecordingToTrash(9999)).toThrow('Recording not found');
   });
 
-  test('deleteRecording removes DB entry and file', () => {
+  test('moveRecordingToTrash sets deleted_at and keeps file', () => {
     const fp = path.join(tmpDir, 'del.mp4');
     fs.writeFileSync(fp, 'data');
     const db = getDb();
     const res = db.prepare("INSERT INTO recordings (filename, filepath) VALUES ('del.mp4', ?)").run(fp);
-    storageService.deleteRecording(res.lastInsertRowid);
-    expect(fs.existsSync(fp)).toBe(false);
+    storageService.moveRecordingToTrash(res.lastInsertRowid);
+    expect(fs.existsSync(fp)).toBe(true);
     const row = db.prepare('SELECT * FROM recordings WHERE id=?').get(res.lastInsertRowid);
+    expect(row.deleted_at).toBeTruthy();
+  });
+
+  test('moveRecordingToTrash blocks deleting favorites', () => {
+    const fp = path.join(tmpDir, 'fav-protected.mp4');
+    fs.writeFileSync(fp, 'data');
+    const db = getDb();
+    const res = db.prepare(
+      "INSERT INTO recordings (filename, filepath, is_favorite) VALUES ('fav-protected.mp4', ?, 1)"
+    ).run(fp);
+    expect(() => storageService.moveRecordingToTrash(res.lastInsertRowid)).toThrow('Favoriten sind vor dem Löschen geschützt');
+    expect(fs.existsSync(fp)).toBe(true);
+    const row = db.prepare('SELECT * FROM recordings WHERE id=?').get(res.lastInsertRowid);
+    expect(row).toBeTruthy();
+  });
+
+  test('moveRecordingsToTrash skips favorites and reports protected ids', () => {
+    const fpA = path.join(tmpDir, 'bulk-a.mp4');
+    const fpB = path.join(tmpDir, 'bulk-b.mp4');
+    fs.writeFileSync(fpA, 'a');
+    fs.writeFileSync(fpB, 'b');
+    const db = getDb();
+    const a = db.prepare(
+      "INSERT INTO recordings (filename, filepath, is_favorite) VALUES ('bulk-a.mp4', ?, 0)"
+    ).run(fpA).lastInsertRowid;
+    const b = db.prepare(
+      "INSERT INTO recordings (filename, filepath, is_favorite) VALUES ('bulk-b.mp4', ?, 1)"
+    ).run(fpB).lastInsertRowid;
+
+    const result = storageService.moveRecordingsToTrash([Number(a), Number(b)]);
+    expect(result.movedIds).toEqual([Number(a)]);
+    expect(result.protectedIds).toEqual([Number(b)]);
+    expect(fs.existsSync(fpA)).toBe(true);
+    expect(fs.existsSync(fpB)).toBe(true);
+  });
+
+  test('restoreRecording removes deleted_at', () => {
+    const fp = path.join(tmpDir, 'restore.mp4');
+    fs.writeFileSync(fp, 'x');
+    const db = getDb();
+    const id = db.prepare("INSERT INTO recordings (filename, filepath) VALUES ('restore.mp4', ?)").run(fp).lastInsertRowid;
+    storageService.moveRecordingToTrash(id);
+    storageService.restoreRecording(id);
+    const row = db.prepare('SELECT * FROM recordings WHERE id=?').get(id);
+    expect(row.deleted_at).toBeNull();
+  });
+
+  test('permanentlyDeleteRecording removes DB entry and file from trash', () => {
+    const fp = path.join(tmpDir, 'hard-delete.mp4');
+    fs.writeFileSync(fp, 'x');
+    const db = getDb();
+    const id = db.prepare("INSERT INTO recordings (filename, filepath) VALUES ('hard-delete.mp4', ?)").run(fp).lastInsertRowid;
+    storageService.moveRecordingToTrash(id);
+    storageService.permanentlyDeleteRecording(id);
+    expect(fs.existsSync(fp)).toBe(false);
+    const row = db.prepare('SELECT * FROM recordings WHERE id=?').get(id);
     expect(row).toBeUndefined();
   });
 });

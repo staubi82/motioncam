@@ -5,19 +5,19 @@ const ffmpegService = require('./ffmpegService');
 function getStats() {
   const db = getDb();
 
-  const totalRecordings = db.prepare('SELECT COUNT(*) as n FROM recordings WHERE processed=1').get().n;
+  const totalRecordings = db.prepare('SELECT COUNT(*) as n FROM recordings WHERE processed=1 AND deleted_at IS NULL').get().n;
   const latestRecordings = db.prepare(
-    'SELECT * FROM recordings WHERE processed=1 ORDER BY created_at DESC LIMIT 8'
+    'SELECT * FROM recordings WHERE processed=1 AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 8'
   ).all();
   const totalDuration = db.prepare(
-    'SELECT SUM(duration_seconds) as s FROM recordings WHERE processed=1'
+    'SELECT SUM(duration_seconds) as s FROM recordings WHERE processed=1 AND deleted_at IS NULL'
   ).get().s || 0;
   const todayCount = db.prepare(
-    "SELECT COUNT(*) as n FROM recordings WHERE date(created_at)=date('now')"
+    "SELECT COUNT(*) as n FROM recordings WHERE processed=1 AND deleted_at IS NULL AND date(created_at)=date('now')"
   ).get().n;
   const isRecording = ffmpegService.isRecording();
   const favoriteRecordings = db.prepare(
-    'SELECT * FROM recordings WHERE processed=1 AND is_favorite=1 ORDER BY created_at DESC LIMIT 6'
+    'SELECT * FROM recordings WHERE processed=1 AND deleted_at IS NULL AND is_favorite=1 ORDER BY created_at DESC LIMIT 6'
   ).all();
 
   return { totalRecordings, latestRecordings, totalDuration, todayCount, isRecording, favoriteRecordings };
@@ -30,6 +30,7 @@ function getLast7DaysActivity() {
     SELECT date(created_at) as day, COUNT(*) as count
     FROM recordings
     WHERE processed = 1
+      AND deleted_at IS NULL
       AND date(created_at) >= date('now', '-6 days')
     GROUP BY date(created_at)
   `).all();

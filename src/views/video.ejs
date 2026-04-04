@@ -1,10 +1,45 @@
 <% title = 'Video'; pageCSS = 'archive'; %>
 <div class="video-detail">
-  <a href="/archive" class="btn btn--secondary btn--back">&larr; Zurück</a>
+  <a href="<%= archiveUrl %>" class="btn btn--secondary btn--back">&larr; Zurück</a>
   <h1 class="video-title"><%= recording.filename %></h1>
-  <video class="video-player" controls preload="metadata">
+  <video class="video-player" controls preload="metadata" autoplay playsinline>
     <source src="/videos/<%= recording.id %>/download" type="video/mp4">
   </video>
+
+  <% if (prevRecording || nextRecording) { %>
+    <div class="video-neighbors">
+      <% if (prevRecording) { %>
+        <a class="video-neighbor" href="<%= prevUrl %>">
+          <div class="video-neighbor__label">← Vorheriges</div>
+          <% if (prevRecording.thumbnail_path) { %>
+            <img src="/thumbnails/<%= prevRecording.thumbnail_path.split('/').pop() %>" alt="" class="video-neighbor__thumb">
+          <% } else { %>
+            <div class="video-neighbor__thumb video-neighbor__thumb--empty">Kein Thumbnail</div>
+          <% } %>
+          <div class="video-neighbor__name"><%= prevRecording.filename %></div>
+          <div class="video-neighbor__meta"><%= new Date(prevRecording.created_at).toLocaleString('de-DE') %></div>
+        </a>
+      <% } else { %>
+        <div class="video-neighbor video-neighbor--placeholder"></div>
+      <% } %>
+
+      <% if (nextRecording) { %>
+        <a class="video-neighbor" href="<%= nextUrl %>">
+          <div class="video-neighbor__label">Nächstes →</div>
+          <% if (nextRecording.thumbnail_path) { %>
+            <img src="/thumbnails/<%= nextRecording.thumbnail_path.split('/').pop() %>" alt="" class="video-neighbor__thumb">
+          <% } else { %>
+            <div class="video-neighbor__thumb video-neighbor__thumb--empty">Kein Thumbnail</div>
+          <% } %>
+          <div class="video-neighbor__name"><%= nextRecording.filename %></div>
+          <div class="video-neighbor__meta"><%= new Date(nextRecording.created_at).toLocaleString('de-DE') %></div>
+        </a>
+      <% } else { %>
+        <div class="video-neighbor video-neighbor--placeholder"></div>
+      <% } %>
+    </div>
+  <% } %>
+
   <div class="video-meta">
     <% if (recording.duration_seconds) { %><div>Dauer: <%= Math.round(recording.duration_seconds) %>s</div><% } %>
     <% if (recording.width) { %><div>Auflösung: <%= recording.width %>×<%= recording.height %></div><% } %>
@@ -13,22 +48,54 @@
   </div>
   <div class="video-actions">
     <a href="/videos/<%= recording.id %>/download" download class="btn btn--primary">Herunterladen</a>
-    <button id="star-btn" class="btn btn--icon"
-      data-id="<%= recording.id %>"
-      data-favorite="<%= recording.is_favorite %>">
-      <%= recording.is_favorite ? '⭐' : '☆' %>
-    </button>
-    <button id="delete-btn" class="btn btn--danger" data-id="<%= recording.id %>">Löschen</button>
+    <% if (!trashActive) { %>
+      <button id="star-btn" class="btn btn--icon"
+        data-id="<%= recording.id %>"
+        data-favorite="<%= recording.is_favorite %>">
+        <%= recording.is_favorite ? '⭐' : '☆' %>
+      </button>
+      <button
+        id="delete-btn"
+        class="btn btn--danger"
+        data-id="<%= recording.id %>"
+        data-permanent="0"
+        <%= recording.is_favorite ? 'disabled title="Favoriten sind geschützt"' : '' %>
+      >
+        In Papierkorb
+      </button>
+    <% } else { %>
+      <button id="restore-btn" class="btn btn--secondary" data-id="<%= recording.id %>">Wiederherstellen</button>
+      <button id="delete-btn" class="btn btn--danger" data-id="<%= recording.id %>" data-permanent="1">Endgültig löschen</button>
+    <% } %>
   </div>
 </div>
 <script>
   document.getElementById('delete-btn').addEventListener('click', async function() {
-    if (!confirm('Aufnahme wirklich löschen?')) return;
-    await fetch('/videos/' + this.dataset.id, { method: 'DELETE' });
-    window.location.href = '/archive';
+    const permanent = this.dataset.permanent === '1';
+    if (!confirm(permanent ? 'Aufnahme endgültig löschen?' : 'In Papierkorb verschieben?')) return;
+    const url = permanent ? ('/videos/' + this.dataset.id + '?permanent=1') : ('/videos/' + this.dataset.id);
+    const res = await fetch(url, { method: 'DELETE' });
+    if (res.ok) {
+      window.location.href = '<%= archiveUrl %>';
+      return;
+    }
+    let data = {};
+    try { data = await res.json(); } catch {}
+    alert(data.message || 'Löschen fehlgeschlagen');
   });
 
-  document.getElementById('star-btn').addEventListener('click', async function() {
+  document.getElementById('restore-btn')?.addEventListener('click', async function() {
+    const res = await fetch('/videos/' + this.dataset.id + '/restore', { method: 'PATCH' });
+    if (res.ok) {
+      window.location.href = '<%= archiveUrl %>';
+      return;
+    }
+    let data = {};
+    try { data = await res.json(); } catch {}
+    alert(data.message || 'Wiederherstellen fehlgeschlagen');
+  });
+
+  document.getElementById('star-btn')?.addEventListener('click', async function() {
     const id = this.dataset.id;
     const current = this.dataset.favorite === '1';
     const next = current ? 0 : 1;

@@ -51,7 +51,10 @@ const selectionToolbar= document.getElementById('selection-toolbar');
 const selectAllCb     = document.getElementById('select-all');
 const selectedCountEl = document.getElementById('selected-count');
 const bulkDeleteBtn   = document.getElementById('bulk-delete-btn');
+const bulkRestoreBtn  = document.getElementById('bulk-restore-btn');
 const grid            = document.getElementById('archive-grid');
+const archiveContext  = document.getElementById('archive-context');
+const isTrashMode     = archiveContext?.dataset.trash === '1';
 
 let selectMode = false;
 
@@ -62,10 +65,12 @@ function getChecked() {
 function updateSelectionUI() {
   const checked = getChecked();
   selectedCountEl.textContent = `${checked.length} ausgewählt`;
-  bulkDeleteBtn.disabled = checked.length === 0;
-  const all = document.querySelectorAll('.card-check');
+  if (bulkDeleteBtn) bulkDeleteBtn.disabled = checked.length === 0;
+  if (bulkRestoreBtn) bulkRestoreBtn.disabled = checked.length === 0;
+  const all = [...document.querySelectorAll('.card-check')].filter(cb => !cb.disabled);
   selectAllCb.indeterminate = checked.length > 0 && checked.length < all.length;
   selectAllCb.checked = all.length > 0 && checked.length === all.length;
+  selectAllCb.disabled = all.length === 0;
 }
 
 function enterSelectMode() {
@@ -91,7 +96,9 @@ selectModeBtn.addEventListener('click', enterSelectMode);
 cancelSelectBtn.addEventListener('click', exitSelectMode);
 
 selectAllCb.addEventListener('change', () => {
-  document.querySelectorAll('.card-check').forEach(cb => cb.checked = selectAllCb.checked);
+  document.querySelectorAll('.card-check').forEach(cb => {
+    if (!cb.disabled) cb.checked = selectAllCb.checked;
+  });
   updateSelectionUI();
 });
 
@@ -100,24 +107,58 @@ grid && grid.addEventListener('change', (e) => {
 });
 
 // ── Bulk delete ───────────────────────────────────────────────
-bulkDeleteBtn.addEventListener('click', () => {
+bulkDeleteBtn?.addEventListener('click', () => {
   const checked = getChecked();
   if (!checked.length) return;
+  const permanent = bulkDeleteBtn.dataset.permanent === '1';
   openModal({
-    title: `${checked.length} Aufnahmen löschen?`,
-    body: `Diese ${checked.length} Aufnahmen werden unwiderruflich gelöscht.`,
+    title: permanent
+      ? `${checked.length} Aufnahmen endgültig löschen?`
+      : `${checked.length} Aufnahmen in Papierkorb verschieben?`,
+    body: permanent
+      ? `Diese ${checked.length} Aufnahmen werden endgültig gelöscht.`
+      : `Diese ${checked.length} Aufnahmen werden in den Papierkorb verschoben.`,
     onConfirm: async () => {
       const ids = checked.map(cb => Number(cb.value));
-      const res = await fetch('/videos/bulk', {
+      const url = permanent ? '/videos/bulk?permanent=1' : '/videos/bulk';
+      const res = await fetch(url, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids }),
       });
+      let data = {};
+      try { data = await res.json(); } catch {}
       if (res.ok) {
-        ids.forEach(id => {
-          document.querySelector(`.recording-card[data-id="${id}"]`)?.remove();
-        });
-        exitSelectMode();
+        if (Array.isArray(data.protectedIds) && data.protectedIds.length > 0 && !permanent) {
+          alert(`${data.protectedIds.length} Favorit(en) wurden nicht gelöscht (geschützt).`);
+        }
+        window.location.reload();
+      } else {
+        alert(data.message || 'Löschen fehlgeschlagen.');
+      }
+    },
+  });
+});
+
+bulkRestoreBtn?.addEventListener('click', () => {
+  const checked = getChecked();
+  if (!checked.length) return;
+  openModal({
+    title: `${checked.length} Aufnahmen wiederherstellen?`,
+    body: `Diese ${checked.length} Aufnahmen werden aus dem Papierkorb wiederhergestellt.`,
+    onConfirm: async () => {
+      const ids = checked.map(cb => Number(cb.value));
+      const res = await fetch('/videos/bulk/restore', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids }),
+      });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        let data = {};
+        try { data = await res.json(); } catch {}
+        alert(data.message || 'Wiederherstellen fehlgeschlagen.');
       }
     },
   });
@@ -128,14 +169,40 @@ document.querySelectorAll('.delete-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     const id = btn.dataset.id;
+    const permanent = btn.dataset.permanent === '1';
     openModal({
-      title: 'Aufnahme löschen?',
-      body: 'Diese Aufnahme wird unwiderruflich gelöscht.',
+      title: permanent ? 'Aufnahme endgültig löschen?' : 'In Papierkorb verschieben?',
+      body: permanent
+        ? 'Diese Aufnahme wird endgültig gelöscht.'
+        : 'Diese Aufnahme wird in den Papierkorb verschoben.',
       onConfirm: async () => {
-        const res = await fetch(`/videos/${id}`, { method: 'DELETE' });
-        if (res.ok) btn.closest('.recording-card').remove();
+        const url = permanent ? `/videos/${id}?permanent=1` : `/videos/${id}`;
+        const res = await fetch(url, { method: 'DELETE' });
+        let data = {};
+        try { data = await res.json(); } catch {}
+        if (res.ok) {
+          window.location.reload();
+          return;
+        }
+        alert(data.message || 'Löschen fehlgeschlagen.');
       },
     });
+  });
+});
+
+// ── Single restore ────────────────────────────────────────────
+document.querySelectorAll('.restore-btn').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const id = btn.dataset.id;
+    const res = await fetch(`/videos/${id}/restore`, { method: 'PATCH' });
+    if (res.ok) {
+      window.location.reload();
+      return;
+    }
+    let data = {};
+    try { data = await res.json(); } catch {}
+    alert(data.message || 'Wiederherstellen fehlgeschlagen.');
   });
 });
 
@@ -154,7 +221,24 @@ document.querySelectorAll('.star-btn').forEach(btn => {
       if (res.ok) {
         btn.dataset.favorite = String(next);
         btn.textContent = next === 1 ? '⭐' : '☆';
-        if (next === 0 && window.location.search.includes('favorites=1')) {
+        const card = btn.closest('.recording-card');
+        if (card) {
+          card.dataset.favorite = String(next);
+          const deleteBtn = card.querySelector('.delete-btn');
+          const checkbox = card.querySelector('.card-check');
+          const isProtected = next === 1;
+          if (deleteBtn) {
+            deleteBtn.disabled = isProtected;
+            deleteBtn.title = isProtected ? 'Favoriten sind geschützt' : '';
+          }
+          if (checkbox) {
+            checkbox.disabled = isProtected;
+            if (isProtected) checkbox.checked = false;
+            checkbox.title = isProtected ? 'Favoriten sind geschützt' : '';
+          }
+        }
+        updateSelectionUI();
+        if (!isTrashMode && next === 0 && window.location.search.includes('favorites=1')) {
           btn.closest('.recording-card').remove();
         }
       }

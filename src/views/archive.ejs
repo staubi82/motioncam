@@ -10,10 +10,17 @@
       <% }) %>
     </select>
     <button class="btn btn--sm btn--secondary" id="select-mode-btn">Auswählen</button>
-    <a href="/archive<%= favoritesActive ? '' : '?favorites=1' %>&per_page=<%= perPage %>"
+    <a href="/archive?favorites=1&per_page=<%= perPage %>"
        class="btn btn--sm <%= favoritesActive ? 'btn--primary' : 'btn--secondary' %>">
       ★ Favoriten
     </a>
+    <a href="/archive?trash=1&per_page=<%= perPage %>"
+       class="btn btn--sm <%= trashActive ? 'btn--primary' : 'btn--secondary' %>">
+      🗑 Papierkorb
+    </a>
+    <% if (favoritesActive || trashActive) { %>
+      <a href="/archive?per_page=<%= perPage %>" class="btn btn--sm btn--secondary">Alle</a>
+    <% } %>
   </div>
 </div>
 
@@ -24,24 +31,36 @@
   </label>
   <span class="selected-count" id="selected-count">0 ausgewählt</span>
   <div class="selection-toolbar__right">
-    <button class="btn btn--danger btn--sm" id="bulk-delete-btn" disabled>Löschen</button>
+    <% if (trashActive) { %>
+      <button class="btn btn--secondary btn--sm" id="bulk-restore-btn" disabled>Wiederherstellen</button>
+      <button class="btn btn--danger btn--sm" id="bulk-delete-btn" data-permanent="1" disabled>Endgültig löschen</button>
+    <% } else { %>
+      <button class="btn btn--danger btn--sm" id="bulk-delete-btn" data-permanent="0" disabled>In Papierkorb</button>
+    <% } %>
     <button class="btn btn--secondary btn--sm" id="cancel-select-btn">Abbrechen</button>
   </div>
 </div>
+
+<div id="archive-context" data-trash="<%= trashActive ? '1' : '0' %>"></div>
 
 <% if (recordings.length === 0) { %>
   <p class="empty-state">Keine Aufnahmen vorhanden.</p>
 <% } else { %>
   <div class="archive-grid" id="archive-grid">
     <% for (const rec of recordings) { %>
-      <div class="recording-card" data-id="<%= rec.id %>">
+      <div class="recording-card" data-id="<%= rec.id %>" data-favorite="<%= rec.is_favorite %>">
         <label class="card-checkbox">
-          <input type="checkbox" class="card-check" value="<%= rec.id %>">
+          <input
+            type="checkbox"
+            class="card-check"
+            value="<%= rec.id %>"
+            <%= (!trashActive && rec.is_favorite) ? 'disabled title="Favoriten sind geschützt"' : '' %>
+          >
           <span class="card-checkbox__mark">
             <svg viewBox="0 0 12 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 5 4.5 8.5 11 1"/></svg>
           </span>
         </label>
-        <a href="/videos/<%= rec.id %>" class="recording-card__link">
+        <a href="/videos/<%= rec.id %>?page=<%= page %>&per_page=<%= perPage %><%= favoritesActive ? '&favorites=1' : '' %><%= trashActive ? '&trash=1' : '' %>" class="recording-card__link">
           <% if (rec.thumbnail_path) { %>
             <img src="/thumbnails/<%= rec.thumbnail_path.split('/').pop() %>" alt="" class="recording-card__thumb">
           <% } else { %>
@@ -54,10 +73,22 @@
           </div>
         </a>
         <div class="recording-card__actions">
-          <button class="btn btn--icon star-btn" data-id="<%= rec.id %>" data-favorite="<%= rec.is_favorite %>">
-            <%= rec.is_favorite ? '⭐' : '☆' %>
-          </button>
-          <button class="btn btn--danger btn--sm delete-btn" data-id="<%= rec.id %>">Löschen</button>
+          <% if (!trashActive) { %>
+            <button class="btn btn--icon star-btn" data-id="<%= rec.id %>" data-favorite="<%= rec.is_favorite %>">
+              <%= rec.is_favorite ? '⭐' : '☆' %>
+            </button>
+            <button
+              class="btn btn--danger btn--sm delete-btn"
+              data-id="<%= rec.id %>"
+              data-permanent="0"
+              <%= rec.is_favorite ? 'disabled title="Favoriten sind geschützt"' : '' %>
+            >
+              In Papierkorb
+            </button>
+          <% } else { %>
+            <button class="btn btn--secondary btn--sm restore-btn" data-id="<%= rec.id %>">Wiederherstellen</button>
+            <button class="btn btn--danger btn--sm delete-btn" data-id="<%= rec.id %>" data-permanent="1">Endgültig löschen</button>
+          <% } %>
         </div>
       </div>
     <% } %>
@@ -65,11 +96,11 @@
 
   <div class="pagination">
     <% if (page > 1) { %>
-      <a href="/archive?page=<%= page - 1 %>&per_page=<%= perPage %><%= favoritesActive ? '&favorites=1' : '' %>" class="btn btn--secondary">Zurück</a>
+      <a href="/archive?page=<%= page - 1 %>&per_page=<%= perPage %><%= favoritesActive ? '&favorites=1' : '' %><%= trashActive ? '&trash=1' : '' %>" class="btn btn--secondary">Zurück</a>
     <% } %>
     <span>Seite <%= page %> / <%= totalPages %></span>
     <% if (page < totalPages) { %>
-      <a href="/archive?page=<%= page + 1 %>&per_page=<%= perPage %><%= favoritesActive ? '&favorites=1' : '' %>" class="btn btn--secondary">Weiter</a>
+      <a href="/archive?page=<%= page + 1 %>&per_page=<%= perPage %><%= favoritesActive ? '&favorites=1' : '' %><%= trashActive ? '&trash=1' : '' %>" class="btn btn--secondary">Weiter</a>
     <% } %>
   </div>
 <% } %>
