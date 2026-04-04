@@ -6,13 +6,20 @@ const modalTitle  = document.getElementById('modal-title');
 const modalBody   = document.getElementById('modal-body');
 const modalCancel = document.getElementById('modal-cancel');
 const modalConfirm= document.getElementById('modal-confirm');
+const defaultConfirmText = modalConfirm?.textContent || 'Löschen';
+const defaultCancelText = modalCancel?.textContent || 'Abbrechen';
 
 let pendingAction = null;
 
-function openModal({ title, body, onConfirm }) {
+function openModal({ title, body, onConfirm, confirmLabel, cancelLabel, hideCancel = false }) {
   modalTitle.textContent  = title;
   modalBody.textContent   = body;
-  pendingAction           = onConfirm;
+  pendingAction           = onConfirm || (async () => {});
+  if (modalConfirm) modalConfirm.textContent = confirmLabel || defaultConfirmText;
+  if (modalCancel) {
+    modalCancel.textContent = cancelLabel || defaultCancelText;
+    modalCancel.style.display = hideCancel ? 'none' : '';
+  }
   modal.classList.add('is-open');
   modal.setAttribute('aria-hidden', 'false');
   modalConfirm.focus();
@@ -21,7 +28,21 @@ function openModal({ title, body, onConfirm }) {
 function closeModal() {
   modal.classList.remove('is-open');
   modal.setAttribute('aria-hidden', 'true');
+  if (modalConfirm) modalConfirm.textContent = defaultConfirmText;
+  if (modalCancel) {
+    modalCancel.textContent = defaultCancelText;
+    modalCancel.style.display = '';
+  }
   pendingAction = null;
+}
+
+function openInfoModal(title, body) {
+  openModal({
+    title,
+    body,
+    confirmLabel: 'OK',
+    hideCancel: true,
+  });
 }
 
 modalCancel.addEventListener('click', closeModal);
@@ -130,11 +151,14 @@ bulkDeleteBtn?.addEventListener('click', () => {
       try { data = await res.json(); } catch {}
       if (res.ok) {
         if (Array.isArray(data.protectedIds) && data.protectedIds.length > 0 && !permanent) {
-          alert(`${data.protectedIds.length} Favorit(en) wurden nicht gelöscht (geschützt).`);
+          openInfoModal(
+            'Teilweise verschoben',
+            `${data.protectedIds.length} Favorit(en) wurden nicht verschoben, weil sie geschützt sind.`,
+          );
         }
         window.location.reload();
       } else {
-        alert(data.message || 'Löschen fehlgeschlagen.');
+        openInfoModal('Aktion fehlgeschlagen', data.message || 'Löschen fehlgeschlagen.');
       }
     },
   });
@@ -158,7 +182,7 @@ bulkRestoreBtn?.addEventListener('click', () => {
       } else {
         let data = {};
         try { data = await res.json(); } catch {}
-        alert(data.message || 'Wiederherstellen fehlgeschlagen.');
+        openInfoModal('Aktion fehlgeschlagen', data.message || 'Wiederherstellen fehlgeschlagen.');
       }
     },
   });
@@ -184,7 +208,7 @@ document.querySelectorAll('.delete-btn').forEach(btn => {
           window.location.reload();
           return;
         }
-        alert(data.message || 'Löschen fehlgeschlagen.');
+        openInfoModal('Aktion fehlgeschlagen', data.message || 'Löschen fehlgeschlagen.');
       },
     });
   });
@@ -202,7 +226,7 @@ document.querySelectorAll('.restore-btn').forEach(btn => {
     }
     let data = {};
     try { data = await res.json(); } catch {}
-    alert(data.message || 'Wiederherstellen fehlgeschlagen.');
+    openInfoModal('Aktion fehlgeschlagen', data.message || 'Wiederherstellen fehlgeschlagen.');
   });
 });
 
